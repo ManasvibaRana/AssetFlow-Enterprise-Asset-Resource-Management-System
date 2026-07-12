@@ -121,6 +121,8 @@ export const api = {
     request<{ ok: boolean }>("/auth/change-password", { method: "POST", body: JSON.stringify(data) }),
   forgotPassword: (email: string) =>
     request<{ ok: boolean }>("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }),
+  resetPassword: (data: { token: string; new_password: string }) =>
+    request<{ ok: boolean }>("/auth/reset-password", { method: "POST", body: JSON.stringify(data) }),
 
   // --- departments ---
   listDepartments: () => request<Department[]>("/departments"),

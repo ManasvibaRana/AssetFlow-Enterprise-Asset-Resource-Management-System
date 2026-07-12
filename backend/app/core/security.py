@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 
-from .config import JWT_ALG, JWT_EXPIRE_MINUTES, JWT_SECRET
+from .config import JWT_ALG, JWT_EXPIRE_MINUTES, JWT_SECRET, RESET_TOKEN_EXPIRE_MINUTES
 
 _ITERATIONS = 200_000
 
@@ -42,3 +42,25 @@ def create_access_token(subject: str, role: str) -> str:
 
 def decode_token(token: str) -> dict:
     return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALG])
+
+
+def create_reset_token(subject: str) -> str:
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": subject,
+        "purpose": "reset",
+        "iat": now,
+        "exp": now + timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES),
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALG)
+
+
+def verify_reset_token(token: str) -> str | None:
+    """Return the user id if the token is a valid, unexpired reset token."""
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALG])
+    except Exception:
+        return None
+    if payload.get("purpose") != "reset":
+        return None
+    return payload.get("sub")

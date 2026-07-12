@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from ..core.config import FRONTEND_URL
 from ..core.db import get_db
 from ..core.deps import get_current_user, require_role
+from ..core.email import send_account_invite
 from ..core.security import hash_password
 from ..models.org import Department, Employee
 from ..schemas import EmployeeIn, RoleIn, StatusIn, is_valid_email
@@ -42,7 +44,12 @@ def employee_options(db: Session = Depends(get_db), _=Depends(get_current_user))
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
-def create_employee(body: EmployeeIn, db: Session = Depends(get_db), _=Depends(require_role("admin"))):
+def create_employee(
+    body: EmployeeIn,
+    background: BackgroundTasks,
+    db: Session = Depends(get_db),
+    _=Depends(require_role("admin")),
+):
     if not body.name.strip():
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Name is required.")
     if not is_valid_email(body.email):
@@ -51,11 +58,12 @@ def create_employee(body: EmployeeIn, db: Session = Depends(get_db), _=Depends(r
         raise HTTPException(status.HTTP_409_CONFLICT, "An employee with this email already exists.")
 
     # Admin-created accounts always start as Employee.
+    temp_password = body.password or DEFAULT_PASSWORD
     e = Employee(
         name=body.name.strip(),
         title=(body.title or "").strip(),
         email=body.email.lower(),
-        password_hash=hash_password(body.password or DEFAULT_PASSWORD),
+        password_hash=hash_password(temp_password),
         department_id=_dept_id(db, body.department),
         role="employee",
         status="active",
@@ -64,6 +72,7 @@ def create_employee(body: EmployeeIn, db: Session = Depends(get_db), _=Depends(r
     create_notification(db, "employee", f"{e.name} was added to the employee directory")
     db.commit()
     db.refresh(e)
+    background.add_task(send_account_invite, e.email, e.name, temp_password, f"{FRONTEND_URL}/login")
     return employee_dict(e)
 
 
