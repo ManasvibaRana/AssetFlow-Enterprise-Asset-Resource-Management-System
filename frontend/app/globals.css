@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Theme tokens. Only the "flippable" surface/text/border colors live here as
+ * RGB channel triples so Tailwind's <alpha-value> opacity modifiers keep working
+ * (e.g. border-border-muted/50). Accent colors (navy, emerald, indigo, status)
+ * are the same in both themes and stay as static hex in tailwind.config.ts.
+ */
+:root {
+  color-scheme: light;
+  --surface: 255 255 255;
+  --surface-subtle: 248 250 252;
+  --surface-container-lowest: 255 255 255;
+  --surface-container-low: 245 243 244;
+  --surface-container: 240 237 239;
+  --surface-container-high: 234 231 233;
+  --surface-variant: 228 226 227;
+  --on-surface: 27 27 29;
+  --on-surface-variant: 69 71 76;
+  --border-muted: 226 232 240;
+  --primary: 9 20 38;
+}
+
+.dark {
+  color-scheme: dark;
+  --surface: 23 27 36;
+  --surface-subtle: 14 17 24;
+  --surface-container-lowest: 23 27 36;
+  --surface-container-low: 29 34 45;
+  --surface-container: 34 42 58;
+  --surface-container-high: 40 49 66;
+  --surface-variant: 45 55 74;
+  --on-surface: 231 234 240;
+  --on-surface-variant: 154 164 180;
+  --border-muted: 42 49 63;
+  --primary: 231 234 240;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Thin, unobtrusive scrollbars for the navy sidebar and scroll areas */
+.scroll-slim::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-slim::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
