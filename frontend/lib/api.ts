@@ -108,6 +108,16 @@ export type AssetCreateInput = {
   photo_url?: string | null;
 };
 
+// Bookable resources (conference rooms) — master data managed in Organization Setup.
+export type Resource = {
+  id: string;
+  name: string;
+  capacity: number;
+  location: string | null;
+  amenities: string[];
+  status: Status;
+};
+
 export const api = {
   // --- auth ---
   signup: (data: { name: string; email: string; password: string }) =>
@@ -137,6 +147,13 @@ export const api = {
   updateCategory: (id: string, c: Omit<Category, "id">) =>
     request<Category>(`/categories/${id}`, { method: "PUT", body: JSON.stringify(c) }),
   deleteCategory: (id: string) => request<null>(`/categories/${id}`, { method: "DELETE" }),
+
+  // --- resources (booking master data; CRUD in Organization Setup) ---
+  listResources: () => request<Resource[]>("/resources"),
+  createResource: (r: Omit<Resource, "id">) => request<Resource>("/resources", { method: "POST", body: JSON.stringify(r) }),
+  updateResource: (id: string, r: Omit<Resource, "id">) =>
+    request<Resource>(`/resources/${id}`, { method: "PUT", body: JSON.stringify(r) }),
+  deleteResource: (id: string) => request<null>(`/resources/${id}`, { method: "DELETE" }),
 
   // --- employees ---
   listEmployees: () => request<Employee[]>("/employees"),

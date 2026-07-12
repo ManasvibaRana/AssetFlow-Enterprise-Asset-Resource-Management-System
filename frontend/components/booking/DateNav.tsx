@@ -14,9 +14,20 @@ function formatLabel(d: Date) {
   });
 }
 
-export function DateNav({ initial = "2026-07-07" }: { initial?: string }) {
+type DateNavProps = {
+  initial?: string;
+  value?: Date; // controlled
+  onChange?: (d: Date) => void;
+};
+
+export function DateNav({ initial = "2026-07-07", value, onChange }: DateNavProps) {
   // Parse yyyy-mm-dd as a local date (noon avoids DST/UTC edge cases).
-  const [date, setDate] = useState(() => new Date(`${initial}T12:00:00`));
+  const [internal, setInternal] = useState(() => new Date(`${initial}T12:00:00`));
+  const date = value ?? internal;
+  const setDate = (d: Date) => {
+    if (value === undefined) setInternal(d);
+    onChange?.(d);
+  };
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -38,11 +49,9 @@ export function DateNav({ initial = "2026-07-07" }: { initial?: string }) {
   }, [open]);
 
   function shiftDay(days: number) {
-    setDate((prev) => {
-      const next = new Date(prev);
-      next.setDate(next.getDate() + days);
-      return next;
-    });
+    const next = new Date(date);
+    next.setDate(next.getDate() + days);
+    setDate(next);
   }
 
   return (

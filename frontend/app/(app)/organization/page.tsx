@@ -2,21 +2,23 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Building2, Tags, Users, ShieldCheck, Lock } from "lucide-react";
+import { Building2, Tags, Users, DoorOpen, ShieldCheck, Lock } from "lucide-react";
 import { DepartmentsTab } from "@/components/organization/DepartmentsTab";
 import { CategoriesTab } from "@/components/organization/CategoriesTab";
 import { EmployeesTab } from "@/components/organization/EmployeesTab";
+import { ResourcesTab } from "@/components/organization/ResourcesTab";
 import { getUser } from "@/lib/auth";
 
-type TabKey = "departments" | "categories" | "employees";
+type TabKey = "departments" | "categories" | "resources" | "employees";
 
 const TABS: { key: TabKey; label: string; icon: typeof Building2 }[] = [
   { key: "departments", label: "Departments", icon: Building2 },
   { key: "categories", label: "Categories", icon: Tags },
+  { key: "resources", label: "Resources", icon: DoorOpen },
   { key: "employees", label: "Employee Directory", icon: Users },
 ];
 
-const TAB_KEYS: TabKey[] = ["departments", "categories", "employees"];
+const TAB_KEYS: TabKey[] = ["departments", "categories", "resources", "employees"];
 
 export default function OrganizationPage() {
   const [tab, setTab] = useState<TabKey>("departments");
@@ -96,6 +98,7 @@ export default function OrganizationPage() {
       {/* Tab content */}
       {tab === "departments" && <DepartmentsTab />}
       {tab === "categories" && <CategoriesTab />}
+      {tab === "resources" && <ResourcesTab />}
       {tab === "employees" && <EmployeesTab />}
     </div>
   );

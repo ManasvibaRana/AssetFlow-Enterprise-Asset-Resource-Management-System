@@ -15,4 +15,6 @@ JWT_EXPIRE_MINUTES = 60 * 24  # 1 day
 CORS_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
 ]

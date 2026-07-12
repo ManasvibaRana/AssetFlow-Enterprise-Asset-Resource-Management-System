@@ -32,7 +32,7 @@ def list_employees(db: Session = Depends(get_db), _=Depends(require_role("admin"
 
 @router.get("/options")
 def employee_options(db: Session = Depends(get_db), _=Depends(get_current_user)):
-    """Lightweight lookup for pickers (allocation, transfer). Any authenticated
+    """Lightweight lookup for pickers (allocation, transfer, booking). Any authenticated
     user can read it; the full directory (with roles/status) stays admin-only."""
     rows = db.query(Employee).filter(Employee.status != "inactive").order_by(Employee.name).all()
     return [
