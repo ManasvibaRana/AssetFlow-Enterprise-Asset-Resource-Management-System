@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .core.config import CORS_ORIGINS
 from .modules.assets.router import router as assets_router
+from .modules.insight.router import router as insight_router
 from .routers import auth, categories, departments, employees, notifications
 from .seed import seed
 
@@ -26,3 +27,4 @@ app.include_router(categories.router)
 app.include_router(employees.router)
 app.include_router(notifications.router)
 app.include_router(assets_router)
+app.include_router(insight_router)
