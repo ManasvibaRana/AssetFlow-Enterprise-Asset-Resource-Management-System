@@ -9,10 +9,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.db import get_db
+from app.core.deps import get_current_user
 from app.models.assets import Allocation, Asset, AssetHistory, Transfer
 from app.routers.notifications import create_notification
 
-router = APIRouter(prefix="/api/assets", tags=["assets"])
+router = APIRouter(prefix="/api/assets", tags=["assets"], dependencies=[Depends(get_current_user)])
 
 
 class AssetCreate(BaseModel):

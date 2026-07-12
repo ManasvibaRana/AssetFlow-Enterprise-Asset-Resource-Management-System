@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Menu, Search, Bell, Building2, Tags, User } from "lucide-react";
+import { Menu, Search, Bell, Building2, Settings, Tags, User } from "lucide-react";
 import { getUser } from "@/lib/auth";
 import { api } from "@/lib/api";
 import { initials, type Category, type Department, type Employee } from "@/lib/mock/org";
@@ -125,6 +125,13 @@ export function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
         >
           <Bell className="h-5 w-5" />
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-status-critical ring-2 ring-surface" />
+        </button>
+        <button
+          aria-label="Settings"
+          onClick={() => router.push("/settings")}
+          className="rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-container-low"
+        >
+          <Settings className="h-5 w-5" />
         </button>
         <button
           aria-label="Profile"
