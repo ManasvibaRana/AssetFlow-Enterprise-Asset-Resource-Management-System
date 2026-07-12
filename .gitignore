@@ -2,6 +2,10 @@
 .mcp.json
 .claude/
 .tokensave/
+
+# Design mockups / Stitch exports — reference only, not pushed
+designs/
+
 # Environment / secrets
 .env
 .env.local
