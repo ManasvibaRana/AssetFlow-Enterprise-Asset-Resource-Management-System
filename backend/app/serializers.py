@@ -1,4 +1,4 @@
-from .models.org import AssetCategory, Department, Employee
+from .models.org import AssetCategory, Department, Employee, Notification
 
 
 def dept_dict(d: Department) -> dict:
@@ -30,4 +30,14 @@ def employee_dict(e: Employee) -> dict:
         "department": e.department.name if e.department else None,
         "role": e.role,
         "status": e.status,
+    }
+
+
+def notification_dict(n: Notification) -> dict:
+    return {
+        "id": n.id,
+        "type": n.type,
+        "message": n.message,
+        "isRead": n.is_read,
+        "createdAt": (n.created_at.isoformat() + "Z") if n.created_at else None,
     }

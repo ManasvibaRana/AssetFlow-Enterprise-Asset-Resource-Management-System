@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .core.config import CORS_ORIGINS
 from .modules.assets.router import router as assets_router
-from .routers import auth, categories, departments, employees
+from .routers import auth, categories, departments, employees, notifications
 from .seed import seed
 
 app = FastAPI(title="AssetFlow API", version="0.1.0")
@@ -24,4 +24,5 @@ app.include_router(auth.router)
 app.include_router(departments.router)
 app.include_router(categories.router)
 app.include_router(employees.router)
+app.include_router(notifications.router)
 app.include_router(assets_router)
