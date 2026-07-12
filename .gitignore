@@ -1,6 +1,7 @@
 # Local Claude Code config — contains API keys / machine state, do NOT commit
 .mcp.json
 .claude/
+.tokensave/
 
 # Design mockups / Stitch exports — reference only, not pushed
 designs/
