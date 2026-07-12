@@ -5,7 +5,7 @@ from ..core.db import get_db
 from ..core.deps import get_current_user
 from ..core.security import create_access_token, hash_password, verify_password
 from ..models.org import Employee
-from ..schemas import ForgotIn, LoginIn, SignupIn, is_valid_email
+from ..schemas import ChangePasswordIn, ForgotIn, LoginIn, ProfileUpdateIn, SignupIn, is_valid_email
 from ..serializers import employee_dict
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -56,6 +56,32 @@ def login(body: LoginIn, db: Session = Depends(get_db)):
 @router.get("/me")
 def me(user: Employee = Depends(get_current_user)):
     return employee_dict(user)
+
+
+@router.patch("/me")
+def update_me(body: ProfileUpdateIn, user: Employee = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not body.name.strip():
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Name is required.")
+    user.name = body.name.strip()
+    user.title = (body.title or "").strip()
+    db.commit()
+    db.refresh(user)
+    return employee_dict(user)
+
+
+@router.post("/change-password")
+def change_password(
+    body: ChangePasswordIn,
+    user: Employee = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not verify_password(body.current_password, user.password_hash):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Current password is incorrect.")
+    if len(body.new_password) < 8:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "New password must be at least 8 characters.")
+    user.password_hash = hash_password(body.new_password)
+    db.commit()
+    return {"ok": True}
 
 
 @router.post("/forgot-password")

@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Building2, Tags, Users, ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Building2, Tags, Users, ShieldCheck, Lock } from "lucide-react";
 import { DepartmentsTab } from "@/components/organization/DepartmentsTab";
 import { CategoriesTab } from "@/components/organization/CategoriesTab";
 import { EmployeesTab } from "@/components/organization/EmployeesTab";
+import { getUser } from "@/lib/auth";
 
 type TabKey = "departments" | "categories" | "employees";
 
@@ -14,8 +16,41 @@ const TABS: { key: TabKey; label: string; icon: typeof Building2 }[] = [
   { key: "employees", label: "Employee Directory", icon: Users },
 ];
 
+const TAB_KEYS: TabKey[] = ["departments", "categories", "employees"];
+
 export default function OrganizationPage() {
   const [tab, setTab] = useState<TabKey>("departments");
+  const [checked, setChecked] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    setIsAdmin(getUser()?.role === "admin");
+    setChecked(true);
+    const t = new URLSearchParams(window.location.search).get("tab") as TabKey | null;
+    if (t && TAB_KEYS.includes(t)) setTab(t);
+  }, []);
+
+  if (!checked) return null;
+
+  if (!isAdmin) {
+    return (
+      <div className="mx-auto flex w-full max-w-md flex-col items-center gap-md p-xl text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-error-container">
+          <Lock className="h-7 w-7 text-on-error-container" />
+        </div>
+        <h1 className="font-headline-md text-headline-md text-primary">Admin access required</h1>
+        <p className="font-body-md text-body-md text-on-surface-variant">
+          Organization Setup is restricted to administrators. Ask an admin to promote your account if you need access.
+        </p>
+        <Link
+          href="/dashboard"
+          className="mt-sm rounded-DEFAULT bg-deep-navy px-5 py-2 font-label-caps text-label-caps font-semibold text-white transition-opacity hover:opacity-90"
+        >
+          Back to Dashboard
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-[1440px] p-lg md:p-xl">

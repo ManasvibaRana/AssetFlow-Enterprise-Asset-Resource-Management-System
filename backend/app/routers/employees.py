@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from ..core.db import get_db
-from ..core.deps import get_current_user, require_role
+from ..core.deps import require_role
 from ..core.security import hash_password
 from ..models.org import Department, Employee
 from ..schemas import EmployeeIn, RoleIn, StatusIn, is_valid_email
@@ -23,7 +23,7 @@ def _dept_id(db: Session, name: str | None) -> str | None:
 
 
 @router.get("")
-def list_employees(db: Session = Depends(get_db), _=Depends(get_current_user)):
+def list_employees(db: Session = Depends(get_db), _=Depends(require_role("admin"))):
     rows = db.query(Employee).order_by(Employee.name).all()
     return [employee_dict(e) for e in rows]
 

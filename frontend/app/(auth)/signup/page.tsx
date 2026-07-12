@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Info } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { setSession } from "@/lib/auth";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -105,14 +106,12 @@ export default function SignupPage() {
           <label htmlFor="password" className="mb-xs block font-label-caps text-label-caps font-semibold text-on-surface-variant">
             Password
           </label>
-          <input
+          <PasswordInput
             id="password"
-            type="password"
             value={form.password}
-            onChange={update("password")}
-            placeholder="••••••••"
-            aria-invalid={!!errors.password}
-            className={`${inputBase} ${errors.password ? errClass : okClass}`}
+            onChange={(v) => setForm((f) => ({ ...f, password: v }))}
+            error={!!errors.password}
+            autoComplete="new-password"
           />
           {errors.password && <p className="mt-xs font-body-sm text-body-sm text-error">{errors.password}</p>}
         </div>
@@ -121,14 +120,12 @@ export default function SignupPage() {
           <label htmlFor="confirm" className="mb-xs block font-label-caps text-label-caps font-semibold text-on-surface-variant">
             Confirm Password
           </label>
-          <input
+          <PasswordInput
             id="confirm"
-            type="password"
             value={form.confirm}
-            onChange={update("confirm")}
-            placeholder="••••••••"
-            aria-invalid={!!errors.confirm}
-            className={`${inputBase} ${errors.confirm ? errClass : okClass}`}
+            onChange={(v) => setForm((f) => ({ ...f, confirm: v }))}
+            error={!!errors.confirm}
+            autoComplete="new-password"
           />
           {errors.confirm && <p className="mt-xs font-body-sm text-body-sm text-error">{errors.confirm}</p>}
         </div>

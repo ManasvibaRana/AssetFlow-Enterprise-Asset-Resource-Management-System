@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { setSession } from "@/lib/auth";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -75,14 +76,12 @@ export default function LoginPage() {
               Forgot password?
             </Link>
           </div>
-          <input
+          <PasswordInput
             id="password"
-            type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            aria-invalid={!!errors.password}
-            className={`${inputBase} ${errors.password ? "border-error focus:border-error focus:ring-error" : "border-border-muted focus:border-indigo-accent focus:ring-indigo-accent"}`}
+            onChange={setPassword}
+            error={!!errors.password}
+            autoComplete="current-password"
           />
           {errors.password && <p className="mt-xs font-body-sm text-body-sm text-error">{errors.password}</p>}
         </div>
@@ -102,10 +101,6 @@ export default function LoginPage() {
           {!submitting && <ArrowRight className="h-5 w-5" />}
         </button>
       </form>
-
-      <p className="mt-md rounded-DEFAULT border border-border-muted bg-surface-subtle px-3 py-2 text-center font-body-sm text-[12px] text-on-surface-variant">
-        Demo admin — <span className="font-mono-data">admin@assetflow.com</span> / <span className="font-mono-data">Admin@123</span>
-      </p>
 
       <p className="mt-lg text-center font-body-sm text-body-sm text-on-surface-variant">
         New here?{" "}

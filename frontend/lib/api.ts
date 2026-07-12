@@ -65,6 +65,10 @@ export const api = {
   login: (data: { email: string; password: string }) =>
     request<AuthResponse>("/auth/login", { method: "POST", body: JSON.stringify(data) }),
   me: () => request<AuthUser>("/auth/me"),
+  updateProfile: (data: { name: string; title: string }) =>
+    request<AuthUser>("/auth/me", { method: "PATCH", body: JSON.stringify(data) }),
+  changePassword: (data: { current_password: string; new_password: string }) =>
+    request<{ ok: boolean }>("/auth/change-password", { method: "POST", body: JSON.stringify(data) }),
   forgotPassword: (email: string) =>
     request<{ ok: boolean }>("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }),
 
