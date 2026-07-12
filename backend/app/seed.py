@@ -98,17 +98,8 @@ def seed() -> None:
                 ]
             )
 
-        if db.query(Notification).count() == 0:
-            now = datetime.utcnow()
-            db.add_all(
-                [
-                    Notification(type="role", message="Michael Torres was promoted to Department Head", is_read=False, created_at=now - timedelta(minutes=8)),
-                    Notification(type="employee", message="James Wilson was added to the employee directory", is_read=False, created_at=now - timedelta(minutes=42)),
-                    Notification(type="category", message="New asset category “AV Equipment” was created", is_read=True, created_at=now - timedelta(hours=3)),
-                    Notification(type="department", message="New department “Field Ops” was added", is_read=True, created_at=now - timedelta(hours=6)),
-                    Notification(type="info", message="Welcome to AssetFlow — your workspace is ready", is_read=True, created_at=now - timedelta(days=1)),
-                ]
-            )
+        # Notifications are no longer seeded — the feed reflects real actions only
+        # (department/category/employee/role changes and asset lifecycle events).
 
         # Insight (P4): seed a sample audit cycle + activity so the pages show live data.
         if db.query(AuditCycle).count() == 0:
