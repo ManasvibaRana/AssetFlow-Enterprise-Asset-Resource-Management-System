@@ -1,8 +1,22 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Menu, Search, Bell, HelpCircle, Settings } from "lucide-react";
+import { getUser } from "@/lib/auth";
+import { initials } from "@/lib/mock/org";
 
 export function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
+  const [userInitials, setUserInitials] = useState("");
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const u = getUser();
+    if (u) {
+      setUserInitials(initials(u.name));
+      setUserName(u.name);
+    }
+  }, []);
+
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-sm border-b border-border-muted bg-surface px-md md:px-lg">
       {/* Hamburger — collapses the rail on desktop, opens the drawer on mobile */}
@@ -48,9 +62,10 @@ export function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
         </button>
         <button
           aria-label="Profile"
+          title={userName}
           className="ml-sm flex h-9 w-9 items-center justify-center rounded-full bg-deep-navy font-label-caps text-label-caps font-semibold text-white"
         >
-          MR
+          {userInitials || "··"}
         </button>
       </div>
     </header>
