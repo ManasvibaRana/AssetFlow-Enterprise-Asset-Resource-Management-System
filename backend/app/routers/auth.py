@@ -1,11 +1,27 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from ..core.config import FRONTEND_URL
 from ..core.db import get_db
 from ..core.deps import get_current_user
-from ..core.security import create_access_token, hash_password, verify_password
+from ..core.email import send_password_reset, send_welcome
+from ..core.security import (
+    create_access_token,
+    create_reset_token,
+    hash_password,
+    verify_password,
+    verify_reset_token,
+)
 from ..models.org import Employee
-from ..schemas import ChangePasswordIn, ForgotIn, LoginIn, ProfileUpdateIn, SignupIn, is_valid_email
+from ..schemas import (
+    ChangePasswordIn,
+    ForgotIn,
+    LoginIn,
+    ProfileUpdateIn,
+    ResetPasswordIn,
+    SignupIn,
+    is_valid_email,
+)
 from ..serializers import employee_dict
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -19,7 +35,7 @@ def _session(user: Employee) -> dict:
 
 
 @router.post("/signup")
-def signup(body: SignupIn, db: Session = Depends(get_db)):
+def signup(body: SignupIn, background: BackgroundTasks, db: Session = Depends(get_db)):
     if not body.name.strip():
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Name is required.")
     if not is_valid_email(body.email):
@@ -40,6 +56,7 @@ def signup(body: SignupIn, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
+    background.add_task(send_welcome, user.email, user.name, f"{FRONTEND_URL}/login")
     return _session(user)
 
 
@@ -85,7 +102,26 @@ def change_password(
 
 
 @router.post("/forgot-password")
-def forgot_password(body: ForgotIn):
+def forgot_password(body: ForgotIn, background: BackgroundTasks, db: Session = Depends(get_db)):
     # Always 200 so we don't leak which emails exist.
-    # TODO(P1): generate reset token + send email.
+    user = db.query(Employee).filter(Employee.email == body.email.lower()).first()
+    if user:
+        token = create_reset_token(user.id)
+        reset_url = f"{FRONTEND_URL}/reset-password?token={token}"
+        background.add_task(send_password_reset, user.email, user.name, reset_url)
+    return {"ok": True}
+
+
+@router.post("/reset-password")
+def reset_password(body: ResetPasswordIn, db: Session = Depends(get_db)):
+    user_id = verify_reset_token(body.token)
+    if not user_id:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "This reset link is invalid or has expired.")
+    if len(body.new_password) < 8:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Password must be at least 8 characters.")
+    user = db.query(Employee).filter(Employee.id == user_id).first()
+    if not user:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "This reset link is invalid or has expired.")
+    user.password_hash = hash_password(body.new_password)
+    db.commit()
     return {"ok": True}

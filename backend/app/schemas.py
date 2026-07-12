@@ -25,6 +25,11 @@ class ForgotIn(BaseModel):
     email: str
 
 
+class ResetPasswordIn(BaseModel):
+    token: str
+    new_password: str
+
+
 class ProfileUpdateIn(BaseModel):
     name: str
     title: str | None = ""
