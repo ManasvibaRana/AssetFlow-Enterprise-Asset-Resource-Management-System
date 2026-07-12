@@ -1,4 +1,23 @@
+from .models.ops import MaintenanceRequest
 from .models.org import AssetCategory, Department, Employee, Notification, Resource
+
+
+def maintenance_dict(m: MaintenanceRequest) -> dict:
+    def iso(dt):
+        return (dt.isoformat() + "Z") if dt else None
+
+    return {
+        "id": m.id,
+        "assetTag": m.asset_tag,
+        "assetName": m.asset_name,
+        "priority": m.priority,
+        "issue": m.issue,
+        "status": m.status,
+        "technician": m.technician,
+        "progress": m.progress,
+        "raisedAt": iso(m.raised_at),
+        "resolvedAt": iso(m.resolved_at),
+    }
 
 
 def dept_dict(d: Department) -> dict:

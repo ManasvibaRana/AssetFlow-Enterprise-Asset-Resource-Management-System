@@ -66,6 +66,22 @@ class ResourceIn(BaseModel):
     status: str = "active"
 
 
+# ---- Maintenance (P3) ----
+class MaintenanceIn(BaseModel):
+    asset: str  # asset name, e.g. "Dell Laptop"
+    asset_tag: str | None = None  # real tag when picked from the assets table
+    priority: str = "Medium"
+    issue: str
+
+
+class MaintenanceStatusIn(BaseModel):
+    status: str  # pending | approved | tech_assigned | in_progress | resolved
+
+
+class MaintenanceAssignIn(BaseModel):
+    technician: str | None = None
+
+
 class RoleIn(BaseModel):
     role: str
 
