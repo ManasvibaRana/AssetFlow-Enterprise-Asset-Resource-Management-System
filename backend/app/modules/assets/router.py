@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api/assets", tags=["assets"])
 class AssetCreate(BaseModel):
     name: str
     serial_number: str | None = None
-    category_id: int | None = None
+    category_id: str | None = None
     acquisition_date: date | None = None
     acquisition_cost: Decimal | None = None
     condition: Literal["new", "good", "fair", "poor"] = "good"
@@ -27,9 +27,9 @@ class AssetCreate(BaseModel):
 
 
 class AllocateIn(BaseModel):
-    holder_emp_id: int | None = None
-    holder_dept_id: int | None = None
-    allocated_by: int | None = None
+    holder_emp_id: str | None = None
+    holder_dept_id: str | None = None
+    allocated_by: str | None = None
     expected_return_date: date | None = None
 
     @model_validator(mode="after")
@@ -41,24 +41,24 @@ class AllocateIn(BaseModel):
 
 class ReturnIn(BaseModel):
     checkin_notes: str = ""
-    actor_id: int | None = None
+    actor_id: str | None = None
 
 
 class TransferIn(BaseModel):
     to_holder: str
-    requested_by: int | None = None
+    requested_by: str | None = None
 
 
 class TransferDecision(BaseModel):
     approved: bool
-    approved_by: int | None = None
+    approved_by: str | None = None
 
 
 class Out(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-def event(db: Session, asset_id: int, kind: str, detail: str, actor_id: int | None = None):
+def event(db: Session, asset_id: int, kind: str, detail: str, actor_id: str | None = None):
     db.add(AssetHistory(asset_id=asset_id, event_type=kind, detail=detail, actor_id=actor_id))
 
 
@@ -83,7 +83,7 @@ def serialize(asset: Asset) -> dict:
 
 
 @router.get("")
-def list_assets(q: str = "", status_filter: str | None = Query(None, alias="status"), category_id: int | None = None, location: str | None = None, db: Session = Depends(get_db)):
+def list_assets(q: str = "", status_filter: str | None = Query(None, alias="status"), category_id: str | None = None, location: str | None = None, db: Session = Depends(get_db)):
     overdue = select(Allocation).where(Allocation.status == "active", Allocation.expected_return_date < date.today())
     for allocation in db.scalars(overdue):
         allocation.status = "overdue"
@@ -171,9 +171,9 @@ def decide_transfer(transfer_id: int, body: TransferDecision, db: Session = Depe
         allocation = db.scalar(select(Allocation).where(Allocation.asset_id == transfer.asset_id, Allocation.status.in_(["active", "overdue"])))
         if not allocation: raise HTTPException(409, "Allocation changed before approval")
         kind, raw_id = transfer.to_holder.split(":", 1)
-        if kind not in {"employee", "department"} or not raw_id.isdigit(): raise HTTPException(422, "to_holder must be employee:<id> or department:<id>")
-        allocation.holder_emp_id = int(raw_id) if kind == "employee" else None
-        allocation.holder_dept_id = int(raw_id) if kind == "department" else None
+        if kind not in {"employee", "department"} or not raw_id: raise HTTPException(422, "to_holder must be employee:<id> or department:<id>")
+        allocation.holder_emp_id = raw_id if kind == "employee" else None
+        allocation.holder_dept_id = raw_id if kind == "department" else None
         transfer.status = "completed"; event(db, transfer.asset_id, "transferred", f"Transferred to {transfer.to_holder}", body.approved_by)
     db.commit()
     return {"status": transfer.status}

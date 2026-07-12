@@ -1,23 +1,28 @@
-from pathlib import Path
+import ssl
+from urllib.parse import urlsplit, urlunsplit
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
+
+from .config import DATABASE_URL
 
 
-class Settings(BaseSettings):
-    database_url: str
-    model_config = SettingsConfigDict(env_file=Path(__file__).parents[3] / ".env")
+def _pg8000_url(raw: str) -> str:
+    parts = urlsplit(raw)
+    return urlunsplit(("postgresql+pg8000", parts.netloc, parts.path, "", ""))
 
 
-engine = create_engine(Settings().database_url.replace("postgresql://", "postgresql+psycopg://", 1), pool_pre_ping=True)
-SessionLocal = sessionmaker(engine, expire_on_commit=False)
-
-
-class Base(DeclarativeBase):
-    pass
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
+engine = create_engine(_pg8000_url(DATABASE_URL), connect_args={"ssl_context": ssl_context}, pool_pre_ping=True)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+Base = declarative_base()
 
 
 def get_db():
-    with SessionLocal() as db:
+    db = SessionLocal()
+    try:
         yield db
+    finally:
+        db.close()

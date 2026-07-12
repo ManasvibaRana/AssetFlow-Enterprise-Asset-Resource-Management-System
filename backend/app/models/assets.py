@@ -14,7 +14,7 @@ class Asset(Base):
     name: Mapped[str] = mapped_column(String(160))
     asset_tag: Mapped[str] = mapped_column(String(24), unique=True, index=True)
     serial_number: Mapped[str | None] = mapped_column(String(120), index=True)
-    category_id: Mapped[int | None] = mapped_column(index=True)
+    category_id: Mapped[str | None] = mapped_column(String(36), index=True)
     acquisition_date: Mapped[date | None] = mapped_column(Date)
     acquisition_cost: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
     condition: Mapped[str] = mapped_column(String(30), default="good")
@@ -33,9 +33,9 @@ class Allocation(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id", ondelete="CASCADE"), index=True)
-    holder_emp_id: Mapped[int | None]
-    holder_dept_id: Mapped[int | None]
-    allocated_by: Mapped[int | None]
+    holder_emp_id: Mapped[str | None] = mapped_column(String(36))
+    holder_dept_id: Mapped[str | None] = mapped_column(String(36))
+    allocated_by: Mapped[str | None] = mapped_column(String(36))
     expected_return_date: Mapped[date | None] = mapped_column(Date)
     returned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     checkin_notes: Mapped[str | None] = mapped_column(Text)
@@ -50,8 +50,8 @@ class Transfer(Base):
     asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id", ondelete="CASCADE"), index=True)
     from_holder: Mapped[str]
     to_holder: Mapped[str]
-    requested_by: Mapped[int | None]
-    approved_by: Mapped[int | None]
+    requested_by: Mapped[str | None] = mapped_column(String(36))
+    approved_by: Mapped[str | None] = mapped_column(String(36))
     status: Mapped[str] = mapped_column(String(20), default="requested")
 
 
@@ -62,6 +62,6 @@ class AssetHistory(Base):
     asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id", ondelete="CASCADE"), index=True)
     event_type: Mapped[str] = mapped_column(String(40))
     detail: Mapped[str] = mapped_column(Text)
-    actor_id: Mapped[int | None]
+    actor_id: Mapped[str | None] = mapped_column(String(36))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=text("now()"))
     asset: Mapped[Asset] = relationship(back_populates="history")
