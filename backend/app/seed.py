@@ -4,7 +4,7 @@ from .core.db import Base, SessionLocal, engine
 from .core.security import hash_password
 from .models.assets import Asset
 from .models.insight import ActivityLog, AuditAssignment, AuditCycle, AuditItem
-from .models.org import AssetCategory, Department, Employee, Notification
+from .models.org import AssetCategory, Department, Employee, Notification, Resource
 
 
 def seed() -> None:
@@ -23,6 +23,16 @@ def seed() -> None:
                     Department(name="Facilities", head="Sarah Jenkins", parent_id=operations.id, status="inactive"),
                     Department(name="Human Resources", head="David Chen", status="active"),
                     Department(name="IT", head="Marcus Lee", parent_id=operations.id, status="active"),
+                ]
+            )
+
+        if db.query(Resource).count() == 0:
+            db.add_all(
+                [
+                    Resource(name="Conference Room B2", capacity=12, location="2nd Floor, East Wing", amenities=["Projector", "Whiteboard", "Video Conf"], status="active"),
+                    Resource(name="Conference Room A1", capacity=6, location="1st Floor, North", amenities=["TV Screen", "Whiteboard"], status="active"),
+                    Resource(name="Executive Boardroom", capacity=20, location="5th Floor", amenities=["Projector", "Video Conf", "Catering"], status="active"),
+                    Resource(name="Huddle Room 3", capacity=4, location="3rd Floor, West", amenities=["TV Screen"], status="active"),
                 ]
             )
 

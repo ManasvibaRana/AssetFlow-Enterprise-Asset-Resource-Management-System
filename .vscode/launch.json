@@ -1,0 +1,39 @@
+{
+  // Run/debug configs for AssetFlow. Open the Run and Debug panel (Ctrl+Shift+D),
+  // pick a config from the dropdown, or choose "Full Stack" to start both at once.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // FastAPI backend on http://localhost:8001 (interactive docs at /docs).
+      // Port 8001 (not 8000) avoids a clash with another local project; the
+      // frontend is pointed here via frontend/.env.local (NEXT_PUBLIC_API_URL).
+      // Requires backend/.venv with requirements installed, and a repo-root .env
+      // containing DATABASE_URL (see backend/README.md). Remove "--reload" if you
+      // want Python breakpoints to bind reliably.
+      "name": "Backend · FastAPI (uvicorn)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.main:app", "--reload", "--port", "8001"],
+      "cwd": "${workspaceFolder}/backend",
+      "python": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      // Next.js frontend on http://localhost:3001 (8000/3000 are used by another project).
+      "name": "Frontend · Next.js (dev)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npx next dev -p 3001",
+      "cwd": "${workspaceFolder}/frontend"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack (Frontend + Backend)",
+      "configurations": ["Backend · FastAPI (uvicorn)", "Frontend · Next.js (dev)"],
+      "stopAll": true
+    }
+  ]
+}

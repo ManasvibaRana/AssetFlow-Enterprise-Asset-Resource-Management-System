@@ -25,4 +25,6 @@ SMTP_FROM = os.environ.get("SMTP_FROM") or SMTP_USER
 CORS_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
 ]
