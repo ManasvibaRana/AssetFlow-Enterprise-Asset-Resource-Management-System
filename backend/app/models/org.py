@@ -1,6 +1,7 @@
 import uuid
+from datetime import datetime
 
-from sqlalchemy import Column, ForeignKey, JSON, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, JSON, String
 from sqlalchemy.orm import relationship
 
 from ..core.db import Base
@@ -45,3 +46,15 @@ class Employee(Base):
     status = Column(String(20), nullable=False, default="active")
 
     department = relationship("Department")
+
+
+class Notification(Base):
+    # Distinct table name: a teammate's `notifications` table (with a NOT NULL
+    # user_id) already exists in the shared DB, so we avoid colliding with it.
+    __tablename__ = "p1_notifications"
+
+    id = Column(String(36), primary_key=True, default=_uuid)
+    type = Column(String(40), nullable=False, default="info")
+    message = Column(String(400), nullable=False)
+    is_read = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)

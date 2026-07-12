@@ -6,6 +6,7 @@ from ..core.deps import get_current_user, require_role
 from ..models.org import Department
 from ..schemas import DepartmentIn
 from ..serializers import dept_dict
+from .notifications import create_notification
 
 router = APIRouter(prefix="/departments", tags=["departments"])
 
@@ -38,6 +39,7 @@ def create_department(body: DepartmentIn, db: Session = Depends(get_db), _=Depen
         status=body.status,
     )
     db.add(d)
+    create_notification(db, "department", f"New department “{d.name}” was added")
     db.commit()
     db.refresh(d)
     return dept_dict(d)

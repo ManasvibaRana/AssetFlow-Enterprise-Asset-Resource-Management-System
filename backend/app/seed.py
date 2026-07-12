@@ -1,6 +1,10 @@
+from datetime import date, datetime, timedelta
+
 from .core.db import Base, SessionLocal, engine
 from .core.security import hash_password
-from .models.org import AssetCategory, Department, Employee
+from .models.assets import Asset
+from .models.insight import ActivityLog, AuditAssignment, AuditCycle, AuditItem
+from .models.org import AssetCategory, Department, Employee, Notification
 
 
 def seed() -> None:
@@ -93,6 +97,35 @@ def seed() -> None:
                     ),
                 ]
             )
+
+        # Notifications are no longer seeded — the feed reflects real actions only
+        # (department/category/employee/role changes and asset lifecycle events).
+
+        # Insight (P4): seed a sample audit cycle + activity so the pages show live data.
+        if db.query(AuditCycle).count() == 0:
+            admin = db.query(Employee).filter(Employee.role == "admin").first()
+            assets = db.query(Asset).all()
+            if admin:
+                cycle = AuditCycle(
+                    name="Q3 Physical Verification",
+                    scope_location=None,
+                    start_date=date.today() - timedelta(days=3),
+                    end_date=date.today() + timedelta(days=11),
+                    status="open",
+                    created_by=admin.id,
+                )
+                db.add(cycle)
+                db.flush()
+                db.add(AuditAssignment(cycle_id=cycle.id, auditor_id=admin.id))
+                for a in assets:
+                    db.add(AuditItem(cycle_id=cycle.id, asset_id=a.id, auditor_id=admin.id, result="pending"))
+                db.add_all(
+                    [
+                        ActivityLog(actor_id=admin.id, action="Created audit cycle", entity_type="audit_cycle", entity_id=cycle.id),
+                        ActivityLog(actor_id=admin.id, action="Promoted Michael Torres to Department Head", entity_type="employee", entity_id=admin.id),
+                        ActivityLog(actor_id=admin.id, action="Registered new asset", entity_type="asset", entity_id=str(assets[0].id) if assets else "0"),
+                    ]
+                )
 
         db.commit()
     finally:
