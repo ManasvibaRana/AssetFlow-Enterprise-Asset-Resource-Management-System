@@ -1,7 +1,7 @@
 # Local Claude Code config — contains API keys / machine state, do NOT commit
 .mcp.json
 .claude/
-
+.tokensave/
 # Environment / secrets
 .env
 .env.local
