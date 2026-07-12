@@ -120,6 +120,20 @@ export type AssetCreateInput = {
   photo_url?: string | null;
 };
 
+// Maintenance requests (P3 workflow board).
+export type MaintenanceRequest = {
+  id: string;
+  assetTag: string;
+  assetName: string;
+  priority: string;
+  issue: string;
+  status: string; // pending | approved | tech_assigned | in_progress | resolved
+  technician: string | null;
+  progress: number | null;
+  raisedAt: string;
+  resolvedAt: string | null;
+};
+
 // Bookable resources (conference rooms) — master data managed in Organization Setup.
 export type Resource = {
   id: string;
@@ -161,6 +175,18 @@ export const api = {
   updateCategory: (id: string, c: Omit<Category, "id">) =>
     request<Category>(`/categories/${id}`, { method: "PUT", body: JSON.stringify(c) }),
   deleteCategory: (id: string) => request<null>(`/categories/${id}`, { method: "DELETE" }),
+
+  // --- maintenance (P3 workflow board) ---
+  listMaintenance: () => request<MaintenanceRequest[]>("/maintenance"),
+  raiseMaintenance: (data: { asset: string; asset_tag?: string; priority: string; issue: string }) =>
+    request<MaintenanceRequest>("/maintenance", { method: "POST", body: JSON.stringify(data) }),
+  updateMaintenance: (id: string, data: { asset: string; asset_tag?: string; priority: string; issue: string }) =>
+    request<MaintenanceRequest>(`/maintenance/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  moveMaintenance: (id: string, status: string) =>
+    request<MaintenanceRequest>(`/maintenance/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+  assignMaintenance: (id: string, technician: string | null) =>
+    request<MaintenanceRequest>(`/maintenance/${id}/assign`, { method: "PATCH", body: JSON.stringify({ technician }) }),
+  deleteMaintenance: (id: string) => request<null>(`/maintenance/${id}`, { method: "DELETE" }),
 
   // --- resources (booking master data; CRUD in Organization Setup) ---
   listResources: () => request<Resource[]>("/resources"),

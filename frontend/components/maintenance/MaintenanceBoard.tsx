@@ -12,10 +12,13 @@ import {
   Check,
   ArrowRight,
   Clock,
+  Trash2,
+  Pencil,
 } from "lucide-react";
 import { Field } from "@/components/ui/Field";
-import { Input, Textarea } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { api, type MaintenanceRequest } from "@/lib/api";
 
 type Priority = "High" | "Medium" | "Low";
 type ColumnKey = "pending" | "approved" | "assigned" | "in_progress" | "resolved";
@@ -31,10 +34,6 @@ type Card = {
   assignee?: string;
   progress?: number;
 };
-
-const MIN = 60_000;
-const HOUR = 60 * MIN;
-const DAY = 24 * HOUR;
 
 // Relative "time since raised" — just now / minutes / hours / days / weeks / months / years.
 function timeAgo(ms: number, now: number): string {
@@ -79,17 +78,34 @@ const priorityCls: Record<Priority, string> = {
   Low: "bg-emerald-active/15 text-emerald-active border-emerald-active/30",
 };
 
-// Cards seeded relative to load time so the "raised ago" labels span every bucket.
-function initialCards(): Card[] {
-  const t = Date.now();
-  return [
-    { id: "c1", tag: "AF-0062", asset: "Projector", priority: "High", issue: "Bulb flickering", raisedAt: t - 25_000, column: "pending" },
-    { id: "c2", tag: "AF-0120", asset: "Desk", priority: "Medium", issue: "Loose leg", raisedAt: t - 8 * MIN, column: "pending" },
-    { id: "c3", tag: "AF-0034", asset: "Laptop", priority: "High", issue: "Battery swell", raisedAt: t - 3 * HOUR, column: "approved" },
-    { id: "c4", tag: "AF-0876", asset: "HVAC", priority: "Medium", issue: "Regular servicing", raisedAt: t - 2 * DAY, column: "assigned", assignee: "R. Verma" },
-    { id: "c5", tag: "AF-0114", asset: "Dell Laptop", priority: "High", issue: "Keyboard replacement", raisedAt: t - 10 * DAY, column: "in_progress", assignee: "S. Gupta", progress: 60 },
-    { id: "c6", tag: "AF-0450", asset: "Chair", priority: "Low", issue: "Caster repair completed", raisedAt: t - 5 * 30 * DAY, column: "resolved" },
-  ];
+// Board columns ⇄ backend status values.
+const STATUS_TO_COLUMN: Record<string, ColumnKey> = {
+  pending: "pending",
+  approved: "approved",
+  tech_assigned: "assigned",
+  in_progress: "in_progress",
+  resolved: "resolved",
+};
+const COLUMN_TO_STATUS: Record<ColumnKey, string> = {
+  pending: "pending",
+  approved: "approved",
+  assigned: "tech_assigned",
+  in_progress: "in_progress",
+  resolved: "resolved",
+};
+
+function toCard(m: MaintenanceRequest): Card {
+  return {
+    id: m.id,
+    tag: m.assetTag,
+    asset: m.assetName,
+    priority: (PRIORITIES.includes(m.priority as Priority) ? m.priority : "Medium") as Priority,
+    issue: m.issue,
+    raisedAt: m.raisedAt ? new Date(m.raisedAt).getTime() : Date.now(),
+    column: STATUS_TO_COLUMN[m.status] ?? "pending",
+    assignee: m.technician ?? undefined,
+    progress: m.progress ?? undefined,
+  };
 }
 
 function PriorityBadge({ priority }: { priority: Priority }) {
@@ -101,7 +117,10 @@ function csvCell(v: string) {
 }
 
 export function MaintenanceBoard() {
-  const [cards, setCards] = useState<Card[]>(initialCards);
+  const [cards, setCards] = useState<Card[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [people, setPeople] = useState<string[]>([]); // technicians from the employees table
   const [now, setNow] = useState(() => Date.now());
   const [enabled, setEnabled] = useState<Record<Priority, boolean>>({ High: true, Medium: true, Low: true });
   const [filterOpen, setFilterOpen] = useState(false);
@@ -111,9 +130,13 @@ export function MaintenanceBoard() {
   const [detail, setDetail] = useState<Card | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
 
-  // Raise-request form state.
-  const [form, setForm] = useState({ asset: "", issue: "", priority: "Medium" as Priority });
+  // Assets from the assets table (for the raise-request picker).
+  const [assets, setAssets] = useState<{ tag: string; name: string }[]>([]);
+
+  // Raise/edit-request form state. editingId set → the modal is in edit mode.
+  const [form, setForm] = useState({ assetTag: "", issue: "", priority: "Medium" as Priority });
   const [errors, setErrors] = useState<{ asset?: string; issue?: string }>({});
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // Close the filter popover on outside click / Escape.
   useEffect(() => {
@@ -131,6 +154,21 @@ export function MaintenanceBoard() {
       document.removeEventListener("keydown", onKey);
     };
   }, [filterOpen]);
+
+  // Load maintenance requests from the backend.
+  function reload() {
+    return api
+      .listMaintenance()
+      .then((rows) => setCards(rows.map(toCard)))
+      .catch(() => setLoadError("Couldn't load maintenance requests. Is the backend running?"));
+  }
+  useEffect(() => {
+    reload().finally(() => setLoading(false));
+    // Assignee options come from the employees table (same directory the booking pickers use).
+    api.listEmployeeOptions().then((rows) => setPeople(rows.map((r) => r.name))).catch(() => {});
+    api.listAssets().then((rows) => setAssets(rows.map((a) => ({ tag: a.asset_tag, name: a.name })))).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Keep relative "raised ago" labels fresh.
   useEffect(() => {
@@ -152,8 +190,10 @@ export function MaintenanceBoard() {
   const visible = (c: Card) => enabled[c.priority];
   const colTitle = (k: ColumnKey) => COLUMNS.find((c) => c.key === k)!.title;
 
+  // Optimistic move; reload from server if the request fails.
   function moveCard(id: string, column: ColumnKey) {
     setCards((prev) => prev.map((c) => (c.id === id ? { ...c, column } : c)));
+    api.moveMaintenance(id, COLUMN_TO_STATUS[column]).catch(() => reload());
   }
 
   function moveDetailNext() {
@@ -172,6 +212,46 @@ export function MaintenanceBoard() {
     const advance = (col: ColumnKey): ColumnKey => (assignee && col === "approved" ? "assigned" : col);
     setCards((prev) => prev.map((c) => (c.id === id ? { ...c, assignee, column: advance(c.column) } : c)));
     setDetail((d) => (d && d.id === id ? { ...d, assignee, column: advance(d.column) } : d));
+    api.assignMaintenance(id, name || null).catch(() => reload());
+  }
+
+  // Asset picker options; when editing, ensure the request's current asset stays selectable.
+  const assetOptions = (() => {
+    const opts = assets.map((a) => ({ tag: a.tag, name: a.name }));
+    if (editingId) {
+      const orig = cards.find((c) => c.id === editingId);
+      if (orig && orig.tag && !opts.some((o) => o.tag === orig.tag)) opts.unshift({ tag: orig.tag, name: orig.asset });
+    }
+    return opts;
+  })();
+
+  function openRaise() {
+    setEditingId(null);
+    setForm({ assetTag: "", issue: "", priority: "Medium" });
+    setErrors({});
+    setRaiseOpen(true);
+  }
+
+  function openEdit(card: Card) {
+    setEditingId(card.id);
+    setForm({ assetTag: card.tag, issue: card.issue, priority: card.priority });
+    setErrors({});
+    setDetail(null);
+    setRaiseOpen(true);
+  }
+
+  function closeForm() {
+    setRaiseOpen(false);
+    setEditingId(null);
+    setForm({ assetTag: "", issue: "", priority: "Medium" });
+    setErrors({});
+  }
+
+  function deleteRequest(id: string) {
+    if (!window.confirm("Delete this maintenance request? This cannot be undone.")) return;
+    setCards((prev) => prev.filter((c) => c.id !== id));
+    setDetail(null);
+    api.deleteMaintenance(id).catch(() => reload());
   }
 
   function exportBoard() {
@@ -202,30 +282,38 @@ export function MaintenanceBoard() {
   function submitRaise(e: React.FormEvent) {
     e.preventDefault();
     const next: typeof errors = {};
-    if (!form.asset.trim()) next.asset = "Asset is required.";
+    if (!form.assetTag) next.asset = "Select an asset.";
     if (!form.issue.trim()) next.issue = "Describe the issue.";
     setErrors(next);
     if (Object.keys(next).length) return;
 
-    setCards((prev) => [
-      {
-        id: `c${Date.now()}`,
-        tag: `AF-${1000 + Math.floor(Math.random() * 9000)}`,
-        asset: form.asset.trim(),
-        priority: form.priority,
-        issue: form.issue.trim(),
-        raisedAt: Date.now(),
-        column: "pending",
-      },
-      ...prev,
-    ]);
-    setForm({ asset: "", issue: "", priority: "Medium" });
-    setErrors({});
-    setRaiseOpen(false);
+    const picked = assetOptions.find((a) => a.tag === form.assetTag);
+    const payload = { asset: picked?.name ?? form.assetTag, asset_tag: form.assetTag, priority: form.priority, issue: form.issue.trim() };
+    if (editingId) {
+      api
+        .updateMaintenance(editingId, payload)
+        .then((updated) => setCards((prev) => prev.map((c) => (c.id === editingId ? toCard(updated) : c))))
+        .catch(() => reload());
+    } else {
+      api
+        .raiseMaintenance(payload)
+        .then((created) => setCards((prev) => [toCard(created), ...prev]))
+        .catch(() => reload());
+    }
+    closeForm();
+  }
+
+  if (loading) {
+    return <div className="p-lg font-body-md text-body-md text-on-surface-variant">Loading maintenance board…</div>;
   }
 
   return (
     <div className="flex flex-col">
+      {loadError && (
+        <div className="border-b border-status-warning/30 bg-status-warning/10 px-lg py-sm font-body-sm text-body-sm text-status-warning">
+          {loadError}
+        </div>
+      )}
       {/* Header + actions */}
       <div className="flex flex-col justify-between gap-md border-b border-border-muted bg-surface px-lg py-lg sm:flex-row sm:items-end">
         <div>
@@ -283,7 +371,7 @@ export function MaintenanceBoard() {
             <Download className="h-4 w-4" /> Export Board
           </button>
           <button
-            onClick={() => setRaiseOpen(true)}
+            onClick={openRaise}
             className="flex items-center gap-xs rounded-DEFAULT bg-deep-navy px-md py-1.5 font-body-sm text-body-sm text-white shadow-card transition-opacity hover:opacity-90 dark:bg-indigo-accent"
           >
             <Plus className="h-4 w-4" /> Raise Maintenance Request
@@ -422,21 +510,22 @@ export function MaintenanceBoard() {
       {/* Raise maintenance request modal */}
       {raiseOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-md">
-          <div className="absolute inset-0 bg-black/40" aria-hidden="true" onClick={() => setRaiseOpen(false)} />
-          <div role="dialog" aria-label="Raise maintenance request" className="relative z-10 w-full max-w-md rounded-lg border border-border-muted bg-surface p-lg shadow-lifted">
+          <div className="absolute inset-0 bg-black/40" aria-hidden="true" onClick={closeForm} />
+          <div role="dialog" aria-label={editingId ? "Edit maintenance request" : "Raise maintenance request"} className="relative z-10 w-full max-w-md rounded-lg border border-border-muted bg-surface p-lg shadow-lifted">
             <div className="mb-md flex items-start justify-between">
-              <h2 className="font-headline-sm text-headline-sm font-semibold text-primary">Raise Maintenance Request</h2>
-              <button aria-label="Close" onClick={() => setRaiseOpen(false)} className="rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container-low">
+              <h2 className="font-headline-sm text-headline-sm font-semibold text-primary">{editingId ? "Edit Maintenance Request" : "Raise Maintenance Request"}</h2>
+              <button aria-label="Close" onClick={closeForm} className="rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container-low">
                 <X className="h-5 w-5" />
               </button>
             </div>
             <form className="space-y-md" onSubmit={submitRaise} noValidate>
               <Field label="Asset" error={errors.asset}>
-                <Input
-                  placeholder="e.g. Dell Laptop (a tag is assigned automatically)"
-                  tone={errors.asset ? "error" : "default"}
-                  value={form.asset}
-                  onChange={(e) => setForm((f) => ({ ...f, asset: e.target.value }))}
+                <Select
+                  searchable
+                  options={assetOptions.map((a) => ({ label: `${a.tag} · ${a.name}`, value: a.tag }))}
+                  value={form.assetTag}
+                  onChange={(v) => setForm((f) => ({ ...f, assetTag: v }))}
+                  placeholder={assets.length ? "Search an asset…" : "No assets — register one first"}
                 />
               </Field>
               <Field label="Issue" error={errors.issue}>
@@ -456,11 +545,11 @@ export function MaintenanceBoard() {
                 />
               </Field>
               <div className="flex gap-sm border-t border-border-muted pt-md">
-                <button type="button" onClick={() => setRaiseOpen(false)} className="flex-1 rounded-DEFAULT border border-border-muted bg-surface py-sm font-body-sm text-body-sm font-medium text-on-surface transition-colors hover:bg-surface-subtle">
+                <button type="button" onClick={closeForm} className="flex-1 rounded-DEFAULT border border-border-muted bg-surface py-sm font-body-sm text-body-sm font-medium text-on-surface transition-colors hover:bg-surface-subtle">
                   Cancel
                 </button>
                 <button type="submit" className="flex flex-1 items-center justify-center gap-xs rounded-DEFAULT bg-emerald-active py-sm font-body-sm text-body-sm font-semibold text-white transition-opacity hover:opacity-90">
-                  <Plus className="h-4 w-4" /> Add Request
+                  {editingId ? (<><Check className="h-4 w-4" /> Save Changes</>) : (<><Plus className="h-4 w-4" /> Add Request</>)}
                 </button>
               </div>
             </form>
@@ -498,7 +587,7 @@ export function MaintenanceBoard() {
 
               <Field label="Assignee">
                 <Select
-                  options={[{ label: "Unassigned", value: "" }, ...TECHNICIANS.map((t) => ({ label: t, value: t }))]}
+                  options={[{ label: "Unassigned", value: "" }, ...(people.length ? people : TECHNICIANS).map((t) => ({ label: t, value: t }))]}
                   value={detail.assignee ?? ""}
                   onChange={(v) => assign(detail.id, v)}
                   placeholder="Unassigned"
@@ -525,19 +614,39 @@ export function MaintenanceBoard() {
               )}
             </div>
 
-            <div className="mt-lg flex gap-sm border-t border-border-muted pt-md">
-              <button type="button" onClick={() => setDetail(null)} className="flex-1 rounded-DEFAULT border border-border-muted bg-surface py-sm font-body-sm text-body-sm font-medium text-on-surface transition-colors hover:bg-surface-subtle">
-                Close
-              </button>
-              {detail.column !== "resolved" && (
+            <div className="mt-lg flex items-center justify-between gap-sm border-t border-border-muted pt-md">
+              <div className="flex gap-sm">
+                {detail.column === "pending" && (
+                  <button
+                    type="button"
+                    onClick={() => openEdit(detail)}
+                    className="flex items-center gap-xs rounded-DEFAULT border border-border-muted bg-surface px-3 py-sm font-body-sm text-body-sm font-medium text-on-surface transition-colors hover:bg-surface-subtle"
+                  >
+                    <Pencil className="h-4 w-4" /> Edit
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={moveDetailNext}
-                  className="flex flex-1 items-center justify-center gap-xs rounded-DEFAULT bg-deep-navy py-sm font-body-sm text-body-sm font-semibold text-white transition-opacity hover:opacity-90 dark:bg-indigo-accent"
+                  onClick={() => deleteRequest(detail.id)}
+                  className="flex items-center gap-xs rounded-DEFAULT border border-error/40 bg-error/5 px-3 py-sm font-body-sm text-body-sm font-semibold text-error transition-colors hover:bg-error/10"
                 >
-                  Move to next step <ArrowRight className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" /> Delete
                 </button>
-              )}
+              </div>
+              <div className="flex justify-end gap-sm">
+                <button type="button" onClick={() => setDetail(null)} className="rounded-DEFAULT border border-border-muted bg-surface px-4 py-sm font-body-sm text-body-sm font-medium text-on-surface transition-colors hover:bg-surface-subtle">
+                  Close
+                </button>
+                {detail.column !== "resolved" && (
+                  <button
+                    type="button"
+                    onClick={moveDetailNext}
+                    className="flex items-center justify-center gap-xs whitespace-nowrap rounded-DEFAULT bg-deep-navy px-4 py-sm font-body-sm text-body-sm font-semibold text-white transition-opacity hover:opacity-90 dark:bg-indigo-accent"
+                  >
+                    Next step <ArrowRight className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

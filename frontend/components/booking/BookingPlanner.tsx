@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { DoorOpen, AlertTriangle, CalendarCheck2, Users, Check, MapPin, X } from "lucide-react";
+import { DoorOpen, AlertTriangle, CalendarCheck2, Users, Check, X } from "lucide-react";
 import { DateNav } from "@/components/booking/DateNav";
 import { Timeline, type Booking, toMin } from "@/components/booking/Timeline";
 import { Select } from "@/components/ui/Select";
 import { Field } from "@/components/ui/Field";
+import { Input } from "@/components/ui/Input";
 import { TimePicker } from "@/components/ui/TimePicker";
 import { MultiSelect } from "@/components/ui/MultiSelect";
 import { api } from "@/lib/api";
@@ -89,7 +90,6 @@ export function BookingPlanner() {
     return () => document.removeEventListener("keydown", onKey);
   }, [detail]);
 
-  const room = rooms.find((r) => r.name === resource);
   const bookedByOptions = useMemo(() => {
     const names = bookedBy && !people.includes(bookedBy) ? [bookedBy, ...people] : people;
     return names.map((n) => ({ label: n, value: n }));
@@ -153,33 +153,6 @@ export function BookingPlanner() {
             />
             <DateNav value={date} onChange={setDate} />
           </div>
-
-          {/* Conference room details */}
-          {room && (
-            <div className="flex flex-wrap items-center justify-between gap-md rounded-DEFAULT border border-border-muted bg-surface p-md shadow-card">
-              <div className="flex items-center gap-sm">
-                <div className="flex h-10 w-10 items-center justify-center rounded-DEFAULT bg-indigo-accent/10 text-indigo-accent">
-                  <DoorOpen className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="font-headline-sm text-headline-sm font-semibold text-primary">{room.name}</p>
-                  <div className="mt-0.5 flex flex-wrap items-center gap-md font-body-sm text-body-sm text-on-surface-variant">
-                    <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" /> {room.capacity} seats</span>
-                    {room.location && <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {room.location}</span>}
-                  </div>
-                </div>
-              </div>
-              {room.amenities.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {room.amenities.map((a) => (
-                    <span key={a} className="rounded-full bg-surface-container-high px-2 py-0.5 font-label-caps text-[10px] font-semibold text-on-surface-variant">
-                      {a}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
 
           <Timeline
             bookings={dayBookings}
@@ -258,14 +231,13 @@ export function BookingPlanner() {
             ) : null}
 
             <Field label="Purpose / Notes">
-              <input
+              <Input
                 value={purpose}
                 onChange={(e) => {
                   setPurpose(e.target.value);
                   setJustBooked(null);
                 }}
                 placeholder="e.g. Q3 Planning Session"
-                className="w-full rounded-DEFAULT border border-border-muted px-sm py-sm font-body-sm text-body-sm text-on-surface outline-none transition-colors focus:border-indigo-accent focus:ring-1 focus:ring-indigo-accent"
               />
             </Field>
 

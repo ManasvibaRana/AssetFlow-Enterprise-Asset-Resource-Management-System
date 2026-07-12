@@ -4,6 +4,7 @@ from .core.db import Base, SessionLocal, engine
 from .core.security import hash_password
 from .models.assets import Asset
 from .models.insight import ActivityLog, AuditAssignment, AuditCycle, AuditItem
+from .models.ops import MaintenanceRequest
 from .models.org import AssetCategory, Department, Employee, Notification, Resource
 
 
@@ -35,6 +36,48 @@ def seed() -> None:
                     Resource(name="Huddle Room 3", capacity=4, location="3rd Floor, West", amenities=["TV Screen"], status="active"),
                 ]
             )
+
+        if db.query(MaintenanceRequest).count() == 0:
+            now = datetime.utcnow()
+            # Use real registered assets (cycled) and real employees as technicians;
+            # fall back to demo values only if the tables are empty (fresh DB).
+            asset_pool = [(a.asset_tag, a.name) for a in db.query(Asset).order_by(Asset.asset_tag).all()] or [
+                ("AF-0062", "Projector"),
+                ("AF-0120", "Desk"),
+                ("AF-0034", "Laptop"),
+            ]
+            techs = [
+                e.name
+                for e in db.query(Employee).filter(Employee.status == "active", Employee.role != "admin").order_by(Employee.name).all()
+            ] or ["R. Verma", "S. Gupta"]
+
+            # (priority, issue, status, technician index or None, progress, raised ago, resolved ago)
+            specs = [
+                ("High", "Won't power on", "pending", None, None, timedelta(seconds=25), None),
+                ("Medium", "Overheating under load", "pending", None, None, timedelta(minutes=8), None),
+                ("High", "Battery swelling", "approved", None, None, timedelta(hours=3), None),
+                ("Medium", "Routine servicing", "tech_assigned", 0, None, timedelta(days=2), None),
+                ("High", "Keyboard replacement", "in_progress", 1, 60, timedelta(days=10), None),
+                ("Low", "Casing crack repaired", "resolved", None, None, timedelta(days=150), timedelta(days=149)),
+            ]
+            rows = []
+            for i, (pri, issue, st, tech_idx, prog, raised_ago, resolved_ago) in enumerate(specs):
+                tag, name = asset_pool[i % len(asset_pool)]
+                tech = techs[tech_idx % len(techs)] if tech_idx is not None else None
+                rows.append(
+                    MaintenanceRequest(
+                        asset_tag=tag,
+                        asset_name=name,
+                        priority=pri,
+                        issue=issue,
+                        status=st,
+                        technician=tech,
+                        progress=prog,
+                        raised_at=now - raised_ago,
+                        resolved_at=(now - resolved_ago) if resolved_ago else None,
+                    )
+                )
+            db.add_all(rows)
 
         if db.query(AssetCategory).count() == 0:
             db.add_all(
