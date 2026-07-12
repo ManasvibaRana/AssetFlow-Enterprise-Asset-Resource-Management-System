@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
+import { api, ApiError } from "@/lib/api";
+import { setSession } from "@/lib/auth";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -12,17 +14,28 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [formError, setFormError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const next: typeof errors = {};
     if (!email.trim()) next.email = "Email is required.";
     else if (!EMAIL_RE.test(email)) next.email = "Enter a valid email address.";
     if (!password) next.password = "Password is required.";
     setErrors(next);
-    if (Object.keys(next).length === 0) {
-      // TODO: replace with real auth call
+    setFormError("");
+    if (Object.keys(next).length > 0) return;
+
+    setSubmitting(true);
+    try {
+      const auth = await api.login({ email: email.trim().toLowerCase(), password });
+      setSession(auth);
       router.push("/dashboard");
+    } catch (err) {
+      setFormError(err instanceof ApiError ? err.message : "Something went wrong.");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -58,7 +71,7 @@ export default function LoginPage() {
             <label htmlFor="password" className="block font-label-caps text-label-caps font-semibold text-on-surface-variant">
               Password
             </label>
-            <Link href="#" className="font-body-sm text-body-sm text-indigo-accent hover:underline">
+            <Link href="/forgot-password" className="font-body-sm text-body-sm text-indigo-accent hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -74,14 +87,25 @@ export default function LoginPage() {
           {errors.password && <p className="mt-xs font-body-sm text-body-sm text-error">{errors.password}</p>}
         </div>
 
+        {formError && (
+          <p className="rounded-DEFAULT bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container">
+            {formError}
+          </p>
+        )}
+
         <button
           type="submit"
-          className="mt-sm flex w-full items-center justify-center gap-xs rounded-DEFAULT bg-deep-navy py-2.5 font-headline-sm text-headline-sm text-white transition-colors hover:bg-primary-container"
+          disabled={submitting}
+          className="mt-sm flex w-full items-center justify-center gap-xs rounded-DEFAULT bg-deep-navy py-2.5 font-headline-sm text-headline-sm text-white transition-colors hover:bg-primary-container disabled:opacity-60"
         >
-          Sign In
-          <ArrowRight className="h-5 w-5" />
+          {submitting ? "Signing in..." : "Sign In"}
+          {!submitting && <ArrowRight className="h-5 w-5" />}
         </button>
       </form>
+
+      <p className="mt-md rounded-DEFAULT border border-border-muted bg-surface-subtle px-3 py-2 text-center font-body-sm text-[12px] text-on-surface-variant">
+        Demo admin — <span className="font-mono-data">admin@assetflow.com</span> / <span className="font-mono-data">Admin@123</span>
+      </p>
 
       <p className="mt-lg text-center font-body-sm text-body-sm text-on-surface-variant">
         New here?{" "}

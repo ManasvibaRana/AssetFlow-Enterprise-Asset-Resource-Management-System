@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Info } from "lucide-react";
+import { api, ApiError } from "@/lib/api";
+import { setSession } from "@/lib/auth";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -18,13 +20,15 @@ export default function SignupPage() {
   const router = useRouter();
   const [form, setForm] = useState({ fullName: "", email: "", password: "", confirm: "" });
   const [errors, setErrors] = useState<Errors>({});
+  const [formError, setFormError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   function update(key: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement>) =>
       setForm((f) => ({ ...f, [key]: e.target.value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const next: Errors = {};
     if (!form.fullName.trim()) next.fullName = "Full name is required.";
@@ -33,9 +37,22 @@ export default function SignupPage() {
     if (form.password.length < 8) next.password = "Password must be at least 8 characters.";
     if (form.confirm !== form.password) next.confirm = "Passwords do not match.";
     setErrors(next);
-    if (Object.keys(next).length === 0) {
-      // TODO: replace with real signup call — always creates an Employee account
+    setFormError("");
+    if (Object.keys(next).length > 0) return;
+
+    setSubmitting(true);
+    try {
+      const auth = await api.signup({
+        name: form.fullName.trim(),
+        email: form.email.trim().toLowerCase(),
+        password: form.password,
+      });
+      setSession(auth);
       router.push("/dashboard");
+    } catch (err) {
+      setFormError(err instanceof ApiError ? err.message : "Something went wrong.");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -124,11 +141,18 @@ export default function SignupPage() {
           </p>
         </div>
 
+        {formError && (
+          <p className="rounded-DEFAULT bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container">
+            {formError}
+          </p>
+        )}
+
         <button
           type="submit"
-          className="mt-sm w-full rounded-DEFAULT bg-emerald-active py-2.5 font-body-md text-body-md font-semibold text-white transition-opacity hover:opacity-90"
+          disabled={submitting}
+          className="mt-sm w-full rounded-DEFAULT bg-emerald-active py-2.5 font-body-md text-body-md font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
-          Create Account
+          {submitting ? "Creating account..." : "Create Account"}
         </button>
       </form>
 
