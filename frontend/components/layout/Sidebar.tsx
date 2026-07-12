@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Plus, LifeBuoy, LogOut, X } from "lucide-react";
+import { Plus, LogOut, X } from "lucide-react";
 import { navItems } from "@/lib/nav";
 import { Logo } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -96,10 +96,6 @@ export function Sidebar({ mobileOpen = false, collapsed = false, onClose }: Side
       {/* Footer */}
       <div className="mt-md space-y-1 border-t border-border-muted px-sm pt-md dark:border-white/10">
         <ThemeToggle />
-        <Link href="#" className={"flex items-center gap-md rounded-DEFAULT py-2 pl-[14px] pr-md font-label-caps text-label-caps font-semibold " + inactiveRow}>
-          <LifeBuoy className="h-[18px] w-[18px] shrink-0" strokeWidth={2} />
-          <span>Support</span>
-        </Link>
         <button onClick={signOut} className={"flex w-full items-center gap-md rounded-DEFAULT py-2 pl-[14px] pr-md font-label-caps text-label-caps font-semibold " + inactiveRow}>
           <LogOut className="h-[18px] w-[18px] shrink-0" strokeWidth={2} />
           <span>Sign Out</span>

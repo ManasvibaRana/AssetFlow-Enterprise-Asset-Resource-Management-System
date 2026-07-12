@@ -6,6 +6,7 @@ from ..core.deps import get_current_user, require_role
 from ..models.org import AssetCategory
 from ..schemas import CategoryIn
 from ..serializers import category_dict
+from .notifications import create_notification
 
 router = APIRouter(prefix="/categories", tags=["categories"])
 
@@ -29,6 +30,7 @@ def create_category(body: CategoryIn, db: Session = Depends(get_db), _=Depends(r
         status=body.status,
     )
     db.add(c)
+    create_notification(db, "category", f"New asset category “{c.name}” was created")
     db.commit()
     db.refresh(c)
     return category_dict(c)
