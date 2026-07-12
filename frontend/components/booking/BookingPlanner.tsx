@@ -15,10 +15,10 @@ export type Room = { name: string; capacity: number; location: string; amenities
 
 // Fallback rooms until the Resources master data (Org Setup) loads.
 const FALLBACK_ROOMS: Room[] = [
-  { name: "Conference Room B2", capacity: 12, location: "2nd Floor · East Wing", amenities: ["Projector", "Whiteboard", "Video Conf"] },
-  { name: "Conference Room A1", capacity: 6, location: "1st Floor · North", amenities: ["TV Screen", "Whiteboard"] },
+  { name: "Conference Room B2", capacity: 12, location: "2nd Floor, East Wing", amenities: ["Projector", "Whiteboard", "Video Conf"] },
+  { name: "Conference Room A1", capacity: 6, location: "1st Floor, North", amenities: ["TV Screen", "Whiteboard"] },
   { name: "Executive Boardroom", capacity: 20, location: "5th Floor", amenities: ["Projector", "Video Conf", "Catering"] },
-  { name: "Huddle Room 3", capacity: 4, location: "3rd Floor · West", amenities: ["TV Screen"] },
+  { name: "Huddle Room 3", capacity: 4, location: "3rd Floor, West", amenities: ["TV Screen"] },
 ];
 const ME = "You";
 

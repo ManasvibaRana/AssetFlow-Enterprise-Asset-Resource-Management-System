@@ -115,7 +115,7 @@ export type Resource = {
   capacity: number;
   location: string | null;
   amenities: string[];
-  status: string;
+  status: Status;
 };
 
 export const api = {

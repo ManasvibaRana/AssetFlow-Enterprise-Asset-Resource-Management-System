@@ -1,4 +1,4 @@
-from .models.org import AssetCategory, Department, Employee, Notification
+from .models.org import AssetCategory, Department, Employee, Notification, Resource
 
 
 def dept_dict(d: Department) -> dict:
@@ -18,6 +18,17 @@ def category_dict(c: AssetCategory) -> dict:
         "description": c.description or "",
         "customFields": c.custom_fields or {},
         "status": c.status,
+    }
+
+
+def resource_dict(r: Resource) -> dict:
+    return {
+        "id": r.id,
+        "name": r.name,
+        "capacity": r.capacity,
+        "location": r.location or "",
+        "amenities": r.amenities or [],
+        "status": r.status,
     }
 
 

@@ -58,6 +58,14 @@ class EmployeeIn(BaseModel):
     password: str | None = None
 
 
+class ResourceIn(BaseModel):
+    name: str
+    capacity: int = 1
+    location: str | None = ""
+    amenities: list[str] = []
+    status: str = "active"
+
+
 class RoleIn(BaseModel):
     role: str
 

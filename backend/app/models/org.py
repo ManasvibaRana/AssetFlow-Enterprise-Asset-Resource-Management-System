@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, JSON, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, JSON, String
 from sqlalchemy.orm import relationship
 
 from ..core.db import Base
@@ -30,6 +30,18 @@ class AssetCategory(Base):
     name = Column(String(120), unique=True, nullable=False)
     description = Column(String(500), default="")
     custom_fields = Column(JSON, default=dict)
+    status = Column(String(20), nullable=False, default="active")
+
+
+class Resource(Base):
+    # Bookable resources (conference rooms) — master data for Resource Booking.
+    __tablename__ = "resources"
+
+    id = Column(String(36), primary_key=True, default=_uuid)
+    name = Column(String(120), unique=True, nullable=False)
+    capacity = Column(Integer, nullable=False, default=1)
+    location = Column(String(160), default="")
+    amenities = Column(JSON, default=list)  # list[str]
     status = Column(String(20), nullable=False, default="active")
 
 
