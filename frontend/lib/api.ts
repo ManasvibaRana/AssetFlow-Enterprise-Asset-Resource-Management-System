@@ -96,6 +96,18 @@ export type Asset = {
   history: AssetHistory[];
 };
 
+export type Transfer = {
+  id: number;
+  asset_id: number;
+  asset_tag: string | null;
+  asset_name: string | null;
+  from_holder: string;
+  to_holder: string;
+  requested_by: string | null;
+  approved_by: string | null;
+  status: string;
+};
+
 export type AssetCreateInput = {
   name: string;
   serial_number?: string | null;
@@ -173,4 +185,8 @@ export const api = {
     request<{ status: string }>(`/api/assets/${id}/return`, { method: "POST", body: JSON.stringify(data) }),
   requestTransfer: (id: number, data: { to_holder: string }) =>
     request<{ id: number; status: string }>(`/api/assets/${id}/transfers`, { method: "POST", body: JSON.stringify(data) }),
+  listTransfers: (status?: string) =>
+    request<Transfer[]>(`/api/assets/transfers${status ? `?status=${status}` : ""}`),
+  decideTransfer: (id: number, approved: boolean) =>
+    request<{ status: string }>(`/api/assets/transfers/${id}/decision`, { method: "POST", body: JSON.stringify({ approved }) }),
 };

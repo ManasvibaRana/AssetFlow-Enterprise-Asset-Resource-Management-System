@@ -114,6 +114,26 @@ def create_asset(body: AssetCreate, db: Session = Depends(get_db)):
     return serialize(asset)
 
 
+@router.get("/transfers")
+def list_transfers(status_filter: str | None = Query(None, alias="status"), db: Session = Depends(get_db)):
+    stmt = select(Transfer).order_by(Transfer.id.desc())
+    if status_filter:
+        stmt = stmt.where(Transfer.status == status_filter)
+    result = []
+    for t in db.scalars(stmt):
+        asset = db.get(Asset, t.asset_id)
+        result.append(
+            {
+                "id": t.id, "asset_id": t.asset_id,
+                "asset_tag": asset.asset_tag if asset else None,
+                "asset_name": asset.name if asset else None,
+                "from_holder": t.from_holder, "to_holder": t.to_holder,
+                "requested_by": t.requested_by, "approved_by": t.approved_by, "status": t.status,
+            }
+        )
+    return result
+
+
 @router.get("/{asset_id}")
 def get_asset(asset_id: int, db: Session = Depends(get_db)):
     stmt = select(Asset).where(Asset.id == asset_id).options(selectinload(Asset.allocations), selectinload(Asset.history))
