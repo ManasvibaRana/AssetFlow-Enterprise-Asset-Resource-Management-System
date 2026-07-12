@@ -58,6 +58,32 @@ export type AuthUser = {
 
 export type AuthResponse = { token: string; user: AuthUser };
 
+export type DirectoryPerson = {
+  id: string;
+  name: string;
+  title: string;
+  department: string | null;
+};
+
+// Assets are the master data for bookable resources (those with is_bookable = true).
+export type AssetSummary = {
+  id: number;
+  name: string;
+  asset_tag: string;
+  is_bookable: boolean;
+  status: string;
+};
+
+// Bookable resources (conference rooms) — master data managed in Organization Setup.
+export type Resource = {
+  id: string;
+  name: string;
+  capacity: number;
+  location: string | null;
+  amenities: string[];
+  status: string;
+};
+
 export const api = {
   // --- auth ---
   signup: (data: { name: string; email: string; password: string }) =>
@@ -87,6 +113,19 @@ export const api = {
   updateCategory: (id: string, c: Omit<Category, "id">) =>
     request<Category>(`/categories/${id}`, { method: "PUT", body: JSON.stringify(c) }),
   deleteCategory: (id: string) => request<null>(`/categories/${id}`, { method: "DELETE" }),
+
+  // --- directory (lightweight people list for pickers; any authenticated user) ---
+  listDirectory: () => request<DirectoryPerson[]>("/employees/directory"),
+
+  // --- assets (P2) — used to source bookable resources ---
+  listAssets: () => request<AssetSummary[]>("/api/assets"),
+
+  // --- resources (booking master data; CRUD in Organization Setup) ---
+  listResources: () => request<Resource[]>("/resources"),
+  createResource: (r: Omit<Resource, "id">) => request<Resource>("/resources", { method: "POST", body: JSON.stringify(r) }),
+  updateResource: (id: string, r: Omit<Resource, "id">) =>
+    request<Resource>(`/resources/${id}`, { method: "PUT", body: JSON.stringify(r) }),
+  deleteResource: (id: string) => request<null>(`/resources/${id}`, { method: "DELETE" }),
 
   // --- employees ---
   listEmployees: () => request<Employee[]>("/employees"),
