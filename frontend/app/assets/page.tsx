@@ -1,6 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { isAuthed } from "@/lib/auth";
 
 type History = { id: number; event_type: string; detail: string; created_at: string };
 type Asset = { id: number; name: string; asset_tag: string; serial_number?: string; condition: string; location?: string; status: string; is_bookable: boolean; acquisition_cost?: string; active_allocation?: { holder_emp_id?: string; holder_dept_id?: string; expected_return_date?: string }; history: History[] };
@@ -13,9 +15,14 @@ async function request(path: string, init?: RequestInit) {
 }
 
 export default function AssetsPage() {
+  const router = useRouter();
+  const [ready, setReady] = useState(false);
   const [assets, setAssets] = useState<Asset[]>([]), [query, setQuery] = useState(""), [filter, setFilter] = useState("all"), [selected, setSelected] = useState<Asset | null>(null), [modal, setModal] = useState<"register" | "allocate" | "return" | "transfer" | null>(null), [message, setMessage] = useState("");
   const load = () => request("/assets").then(setAssets).catch(e => setMessage(e.message));
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (!isAuthed()) router.replace("/login");
+    else { setReady(true); load(); }
+  }, [router]);
   const shown = useMemo(() => assets.filter(a => (filter === "all" || a.status === filter) && [a.name, a.asset_tag, a.serial_number, a.location].some(v => v?.toLowerCase().includes(query.toLowerCase()))), [assets, filter, query]);
   const count = (status: string) => assets.filter(a => a.status === status).length;
 
@@ -30,6 +37,7 @@ export default function AssetsPage() {
     } catch (error) { setMessage((error as Error).message); }
   }
 
+  if (!ready) return null;
   return <div className="shell">
     <aside><div className="brand"><span>AF</span><b>AssetFlow</b></div><nav aria-label="Main navigation"><a>Overview</a><a className="active">Assets</a><a>Allocations</a><a>Bookings</a><a>Maintenance</a><a>Audit</a><a>Reports</a></nav><div className="profile"><div>AM</div><span><b>Alex Morgan</b><small>Asset Manager</small></span></div></aside>
     <main>
