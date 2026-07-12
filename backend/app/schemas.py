@@ -25,6 +25,16 @@ class ForgotIn(BaseModel):
     email: str
 
 
+class ProfileUpdateIn(BaseModel):
+    name: str
+    title: str | None = ""
+
+
+class ChangePasswordIn(BaseModel):
+    current_password: str
+    new_password: str
+
+
 # ---- Organization ----
 class DepartmentIn(BaseModel):
     name: str

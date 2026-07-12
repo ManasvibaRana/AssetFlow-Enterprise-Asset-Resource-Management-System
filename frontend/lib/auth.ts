@@ -8,6 +8,10 @@ export function setSession(auth: AuthResponse): void {
   localStorage.setItem(USER_KEY, JSON.stringify(auth.user));
 }
 
+export function updateStoredUser(user: AuthUser): void {
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
 export function getUser(): AuthUser | null {
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(USER_KEY);
