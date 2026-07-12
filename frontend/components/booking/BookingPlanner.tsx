@@ -62,7 +62,7 @@ export function BookingPlanner() {
   useEffect(() => {
     const me = getUser();
     if (me?.name) setBookedBy(me.name);
-    api.listDirectory().then((rows) => setPeople(rows.map((r) => r.name))).catch(() => {});
+    api.listEmployeeOptions().then((rows) => setPeople(rows.map((r) => r.name))).catch(() => {});
     // Resources master data (managed in Organization Setup); keep fallback if none/unavailable.
     api
       .listResources()

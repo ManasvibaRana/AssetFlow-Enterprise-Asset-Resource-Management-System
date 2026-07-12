@@ -7,11 +7,13 @@ from ..core.security import hash_password
 from ..models.org import Department, Employee
 from ..schemas import EmployeeIn, RoleIn, StatusIn, is_valid_email
 from ..serializers import employee_dict
+from .notifications import create_notification
 
 router = APIRouter(prefix="/employees", tags=["employees"])
 
 ASSIGNABLE_ROLES = {"employee", "dept_head", "asset_manager"}
 VALID_STATUSES = {"active", "inactive", "on_leave"}
+ROLE_LABELS = {"employee": "Employee", "dept_head": "Department Head", "asset_manager": "Asset Manager", "admin": "Admin"}
 DEFAULT_PASSWORD = "Welcome@123"  # temp password for admin-created accounts
 
 
@@ -28,12 +30,13 @@ def list_employees(db: Session = Depends(get_db), _=Depends(require_role("admin"
     return [employee_dict(e) for e in rows]
 
 
-@router.get("/directory")
-def directory(db: Session = Depends(get_db), _=Depends(get_current_user)):
-    """Lightweight people list for pickers (booked-by, invite, assignee). Any authenticated user."""
-    rows = db.query(Employee).filter(Employee.status == "active").order_by(Employee.name).all()
+@router.get("/options")
+def employee_options(db: Session = Depends(get_db), _=Depends(get_current_user)):
+    """Lightweight lookup for pickers (allocation, transfer, booking). Any authenticated
+    user can read it; the full directory (with roles/status) stays admin-only."""
+    rows = db.query(Employee).filter(Employee.status != "inactive").order_by(Employee.name).all()
     return [
-        {"id": e.id, "name": e.name, "title": e.title or "", "department": e.department.name if e.department else None}
+        {"id": e.id, "name": e.name, "email": e.email, "department": e.department.name if e.department else None}
         for e in rows
     ]
 
@@ -58,6 +61,7 @@ def create_employee(body: EmployeeIn, db: Session = Depends(get_db), _=Depends(r
         status="active",
     )
     db.add(e)
+    create_notification(db, "employee", f"{e.name} was added to the employee directory")
     db.commit()
     db.refresh(e)
     return employee_dict(e)
@@ -71,6 +75,7 @@ def change_role(emp_id: str, body: RoleIn, db: Session = Depends(get_db), _=Depe
     if not e:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Employee not found.")
     e.role = body.role
+    create_notification(db, "role", f"{e.name} was promoted to {ROLE_LABELS.get(body.role, body.role)}")
     db.commit()
     db.refresh(e)
     return employee_dict(e)

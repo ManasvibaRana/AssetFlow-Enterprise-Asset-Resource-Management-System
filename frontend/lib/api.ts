@@ -35,7 +35,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     let detail = res.statusText;
     try {
       const body = await res.json();
-      if (body?.detail) detail = typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail);
+      if (body?.detail) {
+        detail =
+          typeof body.detail === "string"
+            ? body.detail
+            : (body.detail.message ?? JSON.stringify(body.detail));
+      }
     } catch {
       /* non-JSON error body */
     }
@@ -58,20 +63,49 @@ export type AuthUser = {
 
 export type AuthResponse = { token: string; user: AuthUser };
 
-export type DirectoryPerson = {
+export type AppNotification = {
   id: string;
-  name: string;
-  title: string;
-  department: string | null;
+  type: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
 };
 
-// Assets are the master data for bookable resources (those with is_bookable = true).
-export type AssetSummary = {
+export type AssetHistory = { id: number; event_type: string; detail: string; created_at: string };
+
+export type Asset = {
   id: number;
   name: string;
   asset_tag: string;
+  serial_number?: string | null;
+  category_id?: string | null;
+  acquisition_date?: string | null;
+  acquisition_cost?: string | null;
+  condition: string;
+  location?: string | null;
   is_bookable: boolean;
   status: string;
+  photo_url?: string | null;
+  created_at?: string;
+  active_allocation?: {
+    id: number;
+    holder_emp_id?: string | null;
+    holder_dept_id?: string | null;
+    expected_return_date?: string | null;
+  } | null;
+  history: AssetHistory[];
+};
+
+export type AssetCreateInput = {
+  name: string;
+  serial_number?: string | null;
+  category_id?: string | null;
+  acquisition_date?: string | null;
+  acquisition_cost?: string | null;
+  condition: string;
+  location?: string | null;
+  is_bookable: boolean;
+  photo_url?: string | null;
 };
 
 // Bookable resources (conference rooms) — master data managed in Organization Setup.
@@ -114,12 +148,6 @@ export const api = {
     request<Category>(`/categories/${id}`, { method: "PUT", body: JSON.stringify(c) }),
   deleteCategory: (id: string) => request<null>(`/categories/${id}`, { method: "DELETE" }),
 
-  // --- directory (lightweight people list for pickers; any authenticated user) ---
-  listDirectory: () => request<DirectoryPerson[]>("/employees/directory"),
-
-  // --- assets (P2) — used to source bookable resources ---
-  listAssets: () => request<AssetSummary[]>("/api/assets"),
-
   // --- resources (booking master data; CRUD in Organization Setup) ---
   listResources: () => request<Resource[]>("/resources"),
   createResource: (r: Omit<Resource, "id">) => request<Resource>("/resources", { method: "POST", body: JSON.stringify(r) }),
@@ -135,4 +163,29 @@ export const api = {
     request<Employee>(`/employees/${id}/role`, { method: "PATCH", body: JSON.stringify({ role }) }),
   changeEmployeeStatus: (id: string, status: Status) =>
     request<Employee>(`/employees/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+
+  // --- notifications ---
+  listNotifications: () => request<AppNotification[]>("/notifications"),
+  markNotificationRead: (id: string) => request<{ ok: boolean }>(`/notifications/${id}/read`, { method: "PATCH" }),
+  markAllNotificationsRead: () => request<{ ok: boolean }>("/notifications/read-all", { method: "POST" }),
+
+  // Lightweight employee lookup for pickers (any authenticated user).
+  listEmployeeOptions: () =>
+    request<{ id: string; name: string; email: string; department: string | null }[]>("/employees/options"),
+
+  // --- assets (P2 module, mounted at /api/assets) ---
+  listAssets: (params?: { q?: string; status?: string }) => {
+    const qs = new URLSearchParams();
+    if (params?.q) qs.set("q", params.q);
+    if (params?.status && params.status !== "all") qs.set("status", params.status);
+    const suffix = qs.toString() ? `?${qs.toString()}` : "";
+    return request<Asset[]>(`/api/assets${suffix}`);
+  },
+  createAsset: (data: AssetCreateInput) => request<Asset>("/api/assets", { method: "POST", body: JSON.stringify(data) }),
+  allocateAsset: (id: number, data: { holder_emp_id?: string; holder_dept_id?: string; expected_return_date?: string | null }) =>
+    request<{ id: number; status: string }>(`/api/assets/${id}/allocate`, { method: "POST", body: JSON.stringify(data) }),
+  returnAsset: (id: number, data: { checkin_notes: string }) =>
+    request<{ status: string }>(`/api/assets/${id}/return`, { method: "POST", body: JSON.stringify(data) }),
+  requestTransfer: (id: number, data: { to_holder: string }) =>
+    request<{ id: number; status: string }>(`/api/assets/${id}/transfers`, { method: "POST", body: JSON.stringify(data) }),
 };

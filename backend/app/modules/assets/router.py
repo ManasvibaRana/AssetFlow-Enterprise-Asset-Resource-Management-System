@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.core.db import get_db
 from app.models.assets import Allocation, Asset, AssetHistory, Transfer
+from app.routers.notifications import create_notification
 
 router = APIRouter(prefix="/api/assets", tags=["assets"])
 
@@ -106,6 +107,7 @@ def create_asset(body: AssetCreate, db: Session = Depends(get_db)):
     db.flush()
     asset.asset_tag = f"AF-{asset.id:04d}"
     event(db, asset.id, "registered", f"{asset.name} registered")
+    create_notification(db, "asset", f"Asset {asset.asset_tag} — {asset.name} was registered")
     db.commit()
     db.refresh(asset)
     return serialize(asset)
@@ -129,6 +131,7 @@ def allocate(asset_id: int, body: AllocateIn, db: Session = Depends(get_db)):
     allocation = Allocation(asset_id=asset_id, **body.model_dump())
     db.add(allocation); asset.status = "allocated"
     event(db, asset_id, "allocated", "Asset allocated", body.allocated_by)
+    create_notification(db, "allocation", f"{asset.name} ({asset.asset_tag}) was allocated")
     try: db.commit()
     except IntegrityError:
         db.rollback()
@@ -144,6 +147,7 @@ def return_asset(asset_id: int, body: ReturnIn, db: Session = Depends(get_db)):
     if not allocation: raise HTTPException(409, "Asset has no active allocation")
     allocation.status = "returned"; allocation.returned_at = datetime.now(timezone.utc); allocation.checkin_notes = body.checkin_notes
     asset.status = "available"; event(db, asset_id, "returned", body.checkin_notes or "Asset returned", body.actor_id)
+    create_notification(db, "asset", f"{asset.name} ({asset.asset_tag}) was returned")
     db.commit()
     return {"status": "available"}
 
