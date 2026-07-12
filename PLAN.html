@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AssetFlow — 6-Hour Hackathon Plan</title>
+<style>
+  :root {
+    --bg: #f6f8fb;
+    --surface: #ffffff;
+    --surface-2: #eef1f6;
+    --border: #dbe1ea;
+    --text: #1a2030;
+    --text-dim: #5b6676;
+    --text-faint: #8a94a4;
+    --accent: #4f46e5;
+    --accent-soft: #eceafc;
+    --good: #059669;
+    --warn: #d97706;
+    --crit: #dc2626;
+    --p1: #4f46e5;
+    --p2: #0891b2;
+    --p3: #d97706;
+    --p4: #7c3aed;
+    --code-bg: #f3f5f9;
+    --shadow: 0 1px 2px rgba(20,30,50,.06), 0 4px 16px rgba(20,30,50,.05);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Fira Code", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0e1118;
+      --surface: #161a23;
+      --surface-2: #1d222d;
+      --border: #2a313f;
+      --text: #e7eaf0;
+      --text-dim: #9aa4b4;
+      --text-faint: #6b7686;
+      --accent: #8b83f5;
+      --accent-soft: #24233a;
+      --good: #34d399;
+      --warn: #fbbf24;
+      --crit: #f87171;
+      --p1: #8b83f5;
+      --p2: #38bdf8;
+      --p3: #fbbf24;
+      --p4: #c084fc;
+      --code-bg: #12161f;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 20px rgba(0,0,0,.25);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f8fb; --surface: #ffffff; --surface-2: #eef1f6; --border: #dbe1ea;
+    --text: #1a2030; --text-dim: #5b6676; --text-faint: #8a94a4;
+    --accent: #4f46e5; --accent-soft: #eceafc; --good: #059669; --warn: #d97706; --crit: #dc2626;
+    --p1: #4f46e5; --p2: #0891b2; --p3: #d97706; --p4: #7c3aed;
+    --code-bg: #f3f5f9; --shadow: 0 1px 2px rgba(20,30,50,.06), 0 4px 16px rgba(20,30,50,.05);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1118; --surface: #161a23; --surface-2: #1d222d; --border: #2a313f;
+    --text: #e7eaf0; --text-dim: #9aa4b4; --text-faint: #6b7686;
+    --accent: #8b83f5; --accent-soft: #24233a; --good: #34d399; --warn: #fbbf24; --crit: #f87171;
+    --p1: #8b83f5; --p2: #38bdf8; --p3: #fbbf24; --p4: #c084fc;
+    --code-bg: #12161f; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 20px rgba(0,0,0,.25);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px 96px; }
+
+  /* ---------- Header ---------- */
+  header.hero {
+    padding: 56px 0 36px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 14px;
+  }
+  h1 {
+    font-size: clamp(30px, 5vw, 46px); line-height: 1.08; margin: 0 0 16px;
+    letter-spacing: -.02em; text-wrap: balance; font-weight: 700;
+  }
+  h1 span { color: var(--text-dim); font-weight: 400; }
+  .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+    padding: 6px 13px; font-size: 13px; color: var(--text-dim); box-shadow: var(--shadow);
+  }
+  .chip b { color: var(--text); font-weight: 600; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .callout {
+    margin-top: 26px; background: var(--accent-soft); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 10px; padding: 16px 18px;
+    font-size: 14.5px; color: var(--text);
+  }
+  .callout b { color: var(--accent); }
+
+  /* ---------- Sections ---------- */
+  section { margin-top: 52px; scroll-margin-top: 20px; }
+  h2 {
+    font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-faint); margin: 0 0 6px;
+  }
+  h2 .num { color: var(--accent); margin-right: 8px; font-variant-numeric: tabular-nums; }
+  .sec-title { font-size: 25px; font-weight: 700; letter-spacing: -.015em; margin: 0 0 20px; text-wrap: balance; }
+  p { margin: 0 0 14px; color: var(--text-dim); }
+  p.lead { color: var(--text); }
+
+  /* ---------- Ownership cards ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+  .owner {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 20px; box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .owner::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--pc); }
+  .owner .tag {
+    display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .04em;
+    color: #fff; background: var(--pc); padding: 3px 10px; border-radius: 6px; margin-bottom: 12px;
+  }
+  .owner h3 { font-size: 17px; margin: 0 0 12px; letter-spacing: -.01em; }
+  .owner ul { margin: 0; padding: 0; list-style: none; }
+  .owner li { font-size: 13.5px; color: var(--text-dim); padding: 4px 0 4px 18px; position: relative; }
+  .owner li::before { content: "›"; position: absolute; left: 2px; color: var(--pc); font-weight: 700; }
+  .owner .role { font-size: 12.5px; color: var(--text-faint); margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+
+  /* ---------- Code blocks ---------- */
+  .code-scroll { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); background: var(--code-bg); box-shadow: var(--shadow); }
+  pre { margin: 0; padding: 18px 20px; font-family: var(--mono); font-size: 12.5px; line-height: 1.65; color: var(--text); }
+  code { font-family: var(--mono); }
+  .kw { color: var(--accent); font-weight: 600; }
+  .cm { color: var(--text-faint); font-style: italic; }
+  .en { color: var(--p2); }
+  p code, li code, td code {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 5px;
+    padding: 1px 6px; font-size: 12.5px; color: var(--text);
+  }
+
+  /* ---------- Rule cards ---------- */
+  .rules { display: grid; gap: 14px; }
+  .rule {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px; display: grid; grid-template-columns: 34px 1fr; gap: 14px; box-shadow: var(--shadow);
+  }
+  .rule .n {
+    width: 34px; height: 34px; border-radius: 9px; background: var(--accent-soft); color: var(--accent);
+    display: grid; place-items: center; font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums;
+  }
+  .rule h4 { margin: 3px 0 5px; font-size: 15px; }
+  .rule p { margin: 0; font-size: 13.5px; }
+
+  /* ---------- Timeline ---------- */
+  .phases { display: grid; gap: 0; border-left: 2px solid var(--border); margin-left: 10px; }
+  .phase { position: relative; padding: 0 0 26px 26px; }
+  .phase:last-child { padding-bottom: 0; }
+  .phase::before {
+    content: ""; position: absolute; left: -7px; top: 4px; width: 12px; height: 12px;
+    border-radius: 50%; background: var(--surface); border: 2px solid var(--accent);
+  }
+  .phase .time { font-family: var(--mono); font-size: 12px; color: var(--accent); font-weight: 600; }
+  .phase h4 { margin: 3px 0 8px; font-size: 16px; }
+  .phase ul { margin: 0; padding-left: 18px; }
+  .phase li { font-size: 13.5px; color: var(--text-dim); margin-bottom: 4px; }
+  .phase li b { color: var(--text); }
+
+  /* ---------- Tables ---------- */
+  .table-scroll { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; background: var(--surface); }
+  th, td { text-align: left; padding: 11px 15px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--surface-2); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  td { color: var(--text-dim); }
+  td b { color: var(--text); }
+
+  /* ---------- Checklists ---------- */
+  .checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .checkcard { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px 14px; box-shadow: var(--shadow); border-top: 3px solid var(--pc); }
+  .checkcard h3 { font-size: 15px; margin: 0 0 12px; display: flex; align-items: center; gap: 9px; }
+  .checkcard h3 .badge { font-size: 11px; font-weight: 700; color: #fff; background: var(--pc); padding: 2px 8px; border-radius: 5px; }
+  .checkcard label {
+    display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text-dim);
+    padding: 5px 0; cursor: pointer; line-height: 1.45;
+  }
+  .checkcard input { margin: 3px 0 0; accent-color: var(--pc); width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
+  .checkcard input:checked + span { color: var(--text-faint); text-decoration: line-through; }
+  .checkcard span b { color: var(--text); font-weight: 600; }
+
+  /* ---------- Theme toggle ---------- */
+  .toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 10;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+    padding: 8px 14px; font-size: 12.5px; color: var(--text-dim); cursor: pointer;
+    box-shadow: var(--shadow); font-family: var(--sans); display: flex; align-items: center; gap: 6px;
+  }
+  .toggle:hover { color: var(--text); }
+  .toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  a { color: var(--accent); }
+
+  @media (max-width: 560px) {
+    header.hero { padding: 40px 0 28px; }
+    .rule { grid-template-columns: 1fr; }
+    .rule .n { margin-bottom: 2px; }
+  }
+  @media print {
+    .toggle { display: none; }
+    body { background: #fff; }
+    .owner, .rule, .checkcard, .table-scroll, .code-scroll { break-inside: avoid; }
+    section { break-inside: avoid-page; }
+  }
+</style>
+</head>
+<body>
+<button class="toggle" id="themeToggle" aria-label="Toggle color theme">◐ Theme</button>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">Odoo Hackathon 2026 · Team of 4 · 6 Hours</p>
+    <h1>AssetFlow <span>— build plan &amp; module split</span></h1>
+    <p class="lead" style="max-width:64ch;">Enterprise Asset &amp; Resource Management System. Four full-stack developers, four independent verticals, one locked schema. This is the single source of truth for who builds what.</p>
+    <div class="meta">
+      <span class="chip"><span class="dot" style="background:var(--p2)"></span> <b>Next.js</b> frontend</span>
+      <span class="chip"><span class="dot" style="background:var(--good)"></span> <b>FastAPI</b> / Python</span>
+      <span class="chip"><span class="dot" style="background:var(--accent)"></span> <b>PostgreSQL</b> local</span>
+      <span class="chip"><b>6h</b> budget</span>
+    </div>
+    <div class="callout">
+      <b>Golden rule for independence:</b> lock the <b>DB schema</b> and <b>API contract</b> in the first 45 minutes. After that, each person only touches their own folders. The only two shared imports everyone uses are the <b>auth dependency</b> and the <b>notify() helper</b> — both finished before parallel work begins, so nobody waits.
+    </div>
+  </header>
+
+  <!-- 1. OWNERSHIP -->
+  <section id="ownership">
+    <h2><span class="num">01</span> Module Ownership</h2>
+    <p class="sec-title">Four verticals — each owns DB + API + UI</p>
+    <div class="grid">
+      <div class="owner" style="--pc:var(--p1)">
+        <span class="tag">P1 · Core &amp; Org</span>
+        <h3>Auth + Organization Setup</h3>
+        <ul>
+          <li>Login / Signup (Screen 1)</li>
+          <li>Org Setup: 3 tabs (Screen 3)</li>
+          <li>Employee directory + role promotion</li>
+        </ul>
+        <div class="role"><b>Tables:</b> employees, departments, asset_categories</div>
+      </div>
+      <div class="owner" style="--pc:var(--p2)">
+        <span class="tag">P2 · Assets</span>
+        <h3>Registration + Allocation</h3>
+        <ul>
+          <li>Asset registration + directory (Screen 4)</li>
+          <li>Allocation / Transfer / Return (Screen 5)</li>
+          <li>Double-allocation conflict rule</li>
+        </ul>
+        <div class="role"><b>Tables:</b> assets, allocations, transfers, asset_history</div>
+      </div>
+      <div class="owner" style="--pc:var(--p3)">
+        <span class="tag">P3 · Operations</span>
+        <h3>Booking + Maintenance</h3>
+        <ul>
+          <li>Resource booking + calendar (Screen 6)</li>
+          <li>Maintenance workflow (Screen 7)</li>
+          <li>Overlap + approval logic</li>
+        </ul>
+        <div class="role"><b>Tables:</b> bookings, maintenance_requests</div>
+      </div>
+      <div class="owner" style="--pc:var(--p4)">
+        <span class="tag">P4 · Insight</span>
+        <h3>Dashboard + Audit + Reports</h3>
+        <ul>
+          <li>KPI dashboard (Screen 2)</li>
+          <li>Audit cycles (Screen 8) + Reports (9)</li>
+          <li>Notifications &amp; activity log (Screen 10)</li>
+        </ul>
+        <div class="role"><b>Tables:</b> audit_cycles, audit_items, notifications, activity_logs</div>
+      </div>
+    </div>
+    <p style="margin-top:18px;font-size:13.5px;"><b style="color:var(--text)">Why this order:</b> P1 scaffolds auth first because everyone foreign-keys into <code>employees</code>/<code>departments</code>. P4 ships the <code>notify()</code> helper first because every module emits notifications.</p>
+  </section>
+
+  <!-- 2. REPO STRUCTURE -->
+  <section id="repo">
+    <h2><span class="num">02</span> Repo Structure</h2>
+    <p class="sec-title">Folder-per-owner = near-zero merge conflicts</p>
+    <div class="code-scroll"><pre><code>backend/app/
+  core/          <span class="cm"># P1: db.py, auth.py, config.py, deps.py</span>
+  models/        <span class="cm"># one file per module: org.py, assets.py, ops.py, insight.py</span>
+  modules/
+    org/         <span class="cm"># P1</span>      assets/    <span class="cm"># P2</span>
+    ops/         <span class="cm"># P3</span>      insight/   <span class="cm"># P4  (+ notifications helper)</span>
+  main.py        <span class="cm"># P1: registers all routers</span>
+frontend/app/
+  (auth)/ org/   <span class="cm"># P1</span>      assets/    <span class="cm"># P2</span>
+  ops/           <span class="cm"># P3</span>      audit/ dashboard/ reports/ activity/   <span class="cm"># P4</span>
+  components/ui/ <span class="cm"># SHARED — built in Phase 0, then FROZEN</span>
+  lib/api.ts     <span class="cm"># SHARED — fetch wrapper + auth token</span></code></pre></div>
+    <p style="margin-top:14px;font-size:13.5px;">You only edit files inside your own folders. Shared folders (<code>core/</code>, <code>components/ui/</code>, <code>lib/api.ts</code>) are built in Phase 0 and frozen — changes need a team ping.</p>
+  </section>
+
+  <!-- 3. SCHEMA -->
+  <section id="schema">
+    <h2><span class="num">03</span> Database Schema</h2>
+    <p class="sec-title">Lock this in the first 45 minutes — it's the #1 graded item</p>
+    <div class="code-scroll"><pre><code><span class="cm">-- P1 --------------------------------------------------------------</span>
+<span class="kw">employees</span>(id, name, email UNIQUE, password_hash, department_id →departments,
+  role <span class="en">ENUM[employee|dept_head|asset_manager|admin]</span> DEFAULT employee,
+  status <span class="en">ENUM[active|inactive]</span>, created_at)   <span class="cm">-- signup ALWAYS employee</span>
+<span class="kw">departments</span>(id, name, head_id →employees, parent_id →departments, status)
+<span class="kw">asset_categories</span>(id, name, custom_fields <span class="en">JSONB</span>)   <span class="cm">-- {"warranty_months":24}</span>
+
+<span class="cm">-- P2 --------------------------------------------------------------</span>
+<span class="kw">assets</span>(id, name, asset_tag UNIQUE <span class="en">'AF-0001'</span>, serial_number, category_id,
+  acquisition_date, acquisition_cost, condition, location, is_bookable,
+  status <span class="en">ENUM[available|allocated|reserved|under_maintenance|lost|retired|disposed]</span>,
+  photo_url, created_at)
+<span class="kw">allocations</span>(id, asset_id, holder_emp_id, holder_dept_id, allocated_by,
+  expected_return_date, returned_at, checkin_notes,
+  status <span class="en">ENUM[active|returned|overdue]</span>)
+<span class="kw">transfers</span>(id, asset_id, from_holder, to_holder, requested_by, approved_by,
+  status <span class="en">ENUM[requested|approved|rejected|completed]</span>)
+<span class="kw">asset_history</span>(id, asset_id, event_type, detail, actor_id, created_at)
+
+<span class="cm">-- P3 --------------------------------------------------------------</span>
+<span class="kw">bookings</span>(id, resource_asset_id, booked_by, start_time, end_time,
+  status <span class="en">ENUM[upcoming|ongoing|completed|cancelled]</span>)
+<span class="kw">maintenance_requests</span>(id, asset_id, raised_by, description, priority, photo_url,
+  status <span class="en">ENUM[pending|approved|rejected|tech_assigned|in_progress|resolved]</span>,
+  approved_by, technician_id, created_at, resolved_at)
+
+<span class="cm">-- P4 --------------------------------------------------------------</span>
+<span class="kw">audit_cycles</span>(id, name, scope_dept_id, scope_location, start_date, end_date,
+  status <span class="en">ENUM[open|closed]</span>, created_by)
+<span class="kw">audit_assignments</span>(cycle_id, auditor_id)          <span class="cm">-- PK(cycle_id, auditor_id)</span>
+<span class="kw">audit_items</span>(id, cycle_id, asset_id, auditor_id, notes,
+  result <span class="en">ENUM[pending|verified|missing|damaged]</span>)
+<span class="kw">notifications</span>(id, user_id, type, message, is_read, created_at)
+<span class="kw">activity_logs</span>(id, actor_id, action, entity_type, entity_id, timestamp)</code></pre></div>
+  </section>
+
+  <!-- 4. LOGIC RULES -->
+  <section id="rules">
+    <h2><span class="num">04</span> The Logic Judges Look For</h2>
+    <p class="sec-title">Build these as DB-backed logic, not just UI checks</p>
+    <div class="rules">
+      <div class="rule">
+        <div class="n">1</div>
+        <div>
+          <h4>No double-allocation</h4>
+          <p>An asset may have only one <code>allocations</code> row with <code>status='active'</code>. If someone tries to allocate a held asset, block it, show <em>"currently held by &lt;name&gt;"</em>, and offer a <b>Transfer Request</b> button.</p>
+        </div>
+      </div>
+      <div class="rule">
+        <div class="n">2</div>
+        <div>
+          <h4>No booking overlap</h4>
+          <p>Reject a new booking unless <code>new.end &lt;= existing.start OR new.start &gt;= existing.end</code> for the same resource. 9:00–10:00 booked → 9:30–10:30 rejected, 10:00–11:00 accepted.</p>
+        </div>
+      </div>
+      <div class="rule">
+        <div class="n">3</div>
+        <div>
+          <h4>Automatic status transitions</h4>
+          <p>Maintenance approved → asset <code>under_maintenance</code>; resolved → <code>available</code>. Audit close → confirmed-missing item → asset <code>lost</code>. Overdue allocation auto-flagged past return date.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. TIMELINE -->
+  <section id="timeline">
+    <h2><span class="num">05</span> Timeline · 360 Minutes</h2>
+    <p class="sec-title">Together, then fully parallel, then integrate</p>
+    <div class="phases">
+      <div class="phase">
+        <div class="time">0:00 – 0:45 · FOUNDATION (all together)</div>
+        <h4>Lock the schema, ship the shared plumbing</h4>
+        <ul>
+          <li><b>P1:</b> repo scaffold, Postgres, FastAPI, auth (signup/login/JWT), <code>get_current_user</code> + <code>require_role</code> deps.</li>
+          <li><b>P4:</b> <code>notify()</code> + <code>log_activity()</code> helpers + their tables — ship as importable functions.</li>
+          <li><b>P2 &amp; P3:</b> write models against the schema, seed data, build the frozen <code>components/ui</code> shell.</li>
+          <li><b>ALL:</b> finalize schema + API contract. Do not leave this phase until the schema is locked.</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <div class="time">0:45 – 4:30 · PARALLEL VERTICALS (independent)</div>
+        <h4>Each person: models → API → UI, own folders only</h4>
+        <ul>
+          <li>Only dependencies are <code>require_role</code> (P1) and <code>notify()</code> (P4) — already done.</li>
+          <li>Commit every ~30 min. Aim for 8–12 commits each.</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <div class="time">4:30 – 5:15 · INTEGRATION</div>
+        <h4>Merge to main, wire the dashboard</h4>
+        <ul>
+          <li>P1 reviews &amp; merges branches. P4 wires dashboard KPIs to real data via API.</li>
+          <li>Connect nav links between modules.</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <div class="time">5:15 – 6:00 · POLISH + DEMO PREP</div>
+        <h4>Validation pass, seed the demo story, rehearse</h4>
+        <ul>
+          <li>Seed one clean story: register → allocate → maintenance → approve → resolve → return → audit.</li>
+          <li>Every form + endpoint validated. Everyone rehearses their segment.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. GIT + SCORECARD -->
+  <section id="git">
+    <h2><span class="num">06</span> Git &amp; Evaluation</h2>
+    <p class="sec-title">They grade teamwork — one person's repo is a red flag</p>
+    <p style="font-size:13.5px;">Branch per person: <code>feat/org</code>, <code>feat/assets</code>, <code>feat/ops</code>, <code>feat/insight</code>. Everyone commits under their own name. PR into <code>main</code> (P1 reviews). Protect <code>main</code> — no direct pushes.</p>
+    <div class="table-scroll" style="margin-top:16px;">
+      <table>
+        <thead><tr><th>Criterion (Odoo brief)</th><th>How we cover it</th></tr></thead>
+        <tbody>
+          <tr><td><b>Database design</b> (top weight)</td><td>Normalized schema §3, real FKs, JSONB for category fields</td></tr>
+          <tr><td><b>Real local DB, minimal 3rd-party</b></td><td>PostgreSQL + FastAPI from scratch. No Firebase / Supabase / Mongo Atlas</td></tr>
+          <tr><td><b>Input validation</b></td><td>Pydantic on every endpoint + inline form errors; graceful failures</td></tr>
+          <tr><td><b>Modularity</b></td><td>One folder = one module = one owner</td></tr>
+          <tr><td><b>Clean, consistent UI</b></td><td>Shared <code>components/ui</code> built once, reused everywhere</td></tr>
+          <tr><td><b>Git by whole team</b></td><td>Branch-per-person, everyone commits frequently</td></tr>
+          <tr><td><b>Everyone presents</b></td><td>Each person demos their own vertical (§7)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 7. PRESENTATION -->
+  <section id="present">
+    <h2><span class="num">07</span> Presentation Split</h2>
+    <p class="sec-title">Everyone speaks — demo your own vertical</p>
+    <div class="grid">
+      <div class="owner" style="--pc:var(--p1)"><span class="tag">P1</span><h3>Access &amp; setup</h3><ul><li>Signup never self-elevates</li><li>Org Setup master data</li><li>Promote employee → Asset Manager</li></ul></div>
+      <div class="owner" style="--pc:var(--p2)"><span class="tag">P2</span><h3>Asset lifecycle</h3><ul><li>Register asset (auto tag AF-0001)</li><li>Allocate it</li><li>Double-allocation block + transfer</li></ul></div>
+      <div class="owner" style="--pc:var(--p3)"><span class="tag">P3</span><h3>Operations</h3><ul><li>Book a room → overlap rejection</li><li>Raise + approve maintenance</li><li>Asset auto-flips to Under Maintenance</li></ul></div>
+      <div class="owner" style="--pc:var(--p4)"><span class="tag">P4</span><h3>Insight</h3><ul><li>Run audit → mark missing</li><li>Close → asset becomes Lost</li><li>Dashboard KPIs + notifications</li></ul></div>
+    </div>
+  </section>
+
+  <!-- 8. CHECKLISTS -->
+  <section id="checklists">
+    <h2><span class="num">08</span> Per-Person Checklists</h2>
+    <p class="sec-title">Tick as you go — progress saves in your browser</p>
+    <div class="checks">
+      <div class="checkcard" style="--pc:var(--p1)">
+        <h3><span class="badge">P1</span> Core &amp; Org</h3>
+        <label><input type="checkbox"><span>Repo scaffold, Postgres, FastAPI, <b>.env</b>, README run steps</span></label>
+        <label><input type="checkbox"><span>Signup (employee only), login, JWT, forgot-password, session</span></label>
+        <label><input type="checkbox"><span><b>get_current_user</b> + <b>require_role</b> deps (shared)</span></label>
+        <label><input type="checkbox"><span>Org Tab A: departments CRUD + head + parent + status</span></label>
+        <label><input type="checkbox"><span>Org Tab B: categories CRUD + JSONB custom fields</span></label>
+        <label><input type="checkbox"><span>Org Tab C: directory + <b>role promotion</b> (only place roles change)</span></label>
+        <label><input type="checkbox"><span>Validation + admin-only route guards</span></label>
+      </div>
+      <div class="checkcard" style="--pc:var(--p2)">
+        <h3><span class="badge">P2</span> Assets</h3>
+        <label><input type="checkbox"><span>Asset model + auto <b>asset_tag</b> generator (AF-0001…)</span></label>
+        <label><input type="checkbox"><span>Register form (category, serial, dates, cost, condition, location, bookable, photo)</span></label>
+        <label><input type="checkbox"><span>Directory: search/filter by tag, serial, category, status, dept, location</span></label>
+        <label><input type="checkbox"><span>Lifecycle badge + per-asset allocation &amp; maintenance history</span></label>
+        <label><input type="checkbox"><span>Allocate to employee/dept + expected return date</span></label>
+        <label><input type="checkbox"><span><b>Double-allocation block</b> + Transfer Request button</span></label>
+        <label><input type="checkbox"><span>Transfer workflow: requested → approved → re-allocated</span></label>
+        <label><input type="checkbox"><span>Return flow + check-in notes → status available</span></label>
+        <label><input type="checkbox"><span>Overdue auto-flag → notify + feed dashboard</span></label>
+      </div>
+      <div class="checkcard" style="--pc:var(--p3)">
+        <h3><span class="badge">P3</span> Operations</h3>
+        <label><input type="checkbox"><span>Booking model + calendar view of a resource</span></label>
+        <label><input type="checkbox"><span><b>Overlap validation</b> (reject overlapping slots)</span></label>
+        <label><input type="checkbox"><span>Booking status: upcoming/ongoing/completed/cancelled</span></label>
+        <label><input type="checkbox"><span>Cancel / reschedule + reminder notification</span></label>
+        <label><input type="checkbox"><span>Maintenance: raise request (asset, issue, priority, photo)</span></label>
+        <label><input type="checkbox"><span>Workflow: pending → approved/rejected → assigned → in progress → resolved</span></label>
+        <label><input type="checkbox"><span>Asset auto → under_maintenance / → available</span></label>
+        <label><input type="checkbox"><span>Maintenance history per asset</span></label>
+      </div>
+      <div class="checkcard" style="--pc:var(--p4)">
+        <h3><span class="badge">P4</span> Insight</h3>
+        <label><input type="checkbox"><span><b>notify()</b> + <b>log_activity()</b> helpers + tables (ship FIRST)</span></label>
+        <label><input type="checkbox"><span>Notifications feed UI + mark-as-read</span></label>
+        <label><input type="checkbox"><span>Activity log UI (who did what, when)</span></label>
+        <label><input type="checkbox"><span>Audit: create cycle (scope dept/location, date range)</span></label>
+        <label><input type="checkbox"><span>Assign auditors; mark verified/missing/damaged</span></label>
+        <label><input type="checkbox"><span>Auto discrepancy report + close cycle → missing = Lost</span></label>
+        <label><input type="checkbox"><span>Dashboard KPI cards + overdue highlighted + quick actions</span></label>
+        <label><input type="checkbox"><span>Reports: utilization, maintenance freq, heatmap, export</span></label>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    var KEY = 'assetflow-theme';
+    try {
+      var saved = localStorage.getItem(KEY);
+      if (saved) root.setAttribute('data-theme', saved);
+    } catch (e) {}
+    btn.addEventListener('click', function () {
+      var isDark = root.getAttribute('data-theme') === 'dark'
+        || (!root.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+      var next = isDark ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch (e) {}
+    });
+
+    // Persist checklist progress
+    var boxes = document.querySelectorAll('.checkcard input[type=checkbox]');
+    boxes.forEach(function (box, i) {
+      var k = 'assetflow-check-' + i;
+      try { if (localStorage.getItem(k) === '1') box.checked = true; } catch (e) {}
+      box.addEventListener('change', function () {
+        try { localStorage.setItem(k, box.checked ? '1' : '0'); } catch (e) {}
+      });
+    });
+  })();
+</script>
+</body>
+</html>
