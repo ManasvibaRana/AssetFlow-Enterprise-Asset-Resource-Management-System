@@ -1,9 +1,8 @@
-# Local Claude Code config — contains API keys / machine state, do NOT commit
+# Local tool config and machine state (may contain API keys), do not commit
 .mcp.json
-.claude/
 .tokensave/
 
-# Design mockups / Stitch exports — reference only, not pushed
+# Design mockups and exports, reference only, not pushed
 designs/
 
 # Environment / secrets
