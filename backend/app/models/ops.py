@@ -11,7 +11,7 @@ def _uuid() -> str:
 
 
 class MaintenanceRequest(Base):
-    # P3 — maintenance workflow. Asset is denormalized (tag + name) to stay
+    # P3 - maintenance workflow. Asset is denormalized (tag + name) to stay
     # decoupled from P2's assets table for the hackathon; status drives the board.
     __tablename__ = "maintenance_requests"
 

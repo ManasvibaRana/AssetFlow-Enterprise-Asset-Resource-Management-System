@@ -7,7 +7,7 @@ from .config import SMTP_FROM, SMTP_HOST, SMTP_PASSWORD, SMTP_PORT, SMTP_USER
 
 def send_email(to: str, subject: str, html: str, text: str | None = None) -> bool:
     """Send an email via SMTP. Returns True on success, False otherwise.
-    Never raises — callers treat email as best-effort."""
+    Never raises - callers treat email as best-effort."""
     if not SMTP_HOST or not SMTP_USER:
         print("[email] SMTP not configured; skipping send to", to)
         return False
@@ -52,7 +52,7 @@ def _layout(heading: str, body_html: str, button_text: str | None = None, button
       <div style="margin-top:20px">{button}</div>
     </div>
     <div style="padding:16px 28px;border-top:1px solid #e2e8f0;font-size:12px;color:#8a94a4">
-      AssetFlow — Enterprise Asset &amp; Resource Management. This is an automated message.
+      AssetFlow - Enterprise Asset &amp; Resource Management. This is an automated message.
     </div>
   </div>
 </div>"""

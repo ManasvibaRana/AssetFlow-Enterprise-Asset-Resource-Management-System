@@ -24,7 +24,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AssetFlow — Enterprise Asset & Resource Management",
+  title: "AssetFlow - Enterprise Asset & Resource Management",
   description: "Track, allocate, and maintain physical assets and shared resources.",
 };
 

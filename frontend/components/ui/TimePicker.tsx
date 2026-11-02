@@ -39,7 +39,7 @@ type TimePickerProps = {
   className?: string;
 };
 
-/** Modern custom time picker — a styled popover list replacing <input type="time">. */
+/** Modern custom time picker - a styled popover list replacing <input type="time">. */
 export function TimePicker({
   defaultValue = "09:00",
   value,

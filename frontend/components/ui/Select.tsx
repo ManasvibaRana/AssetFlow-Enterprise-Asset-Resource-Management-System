@@ -19,7 +19,7 @@ type SelectProps = {
 };
 
 /**
- * Modern custom dropdown — a styled replacement for the native <select>.
+ * Modern custom dropdown - a styled replacement for the native <select>.
  * Works controlled (pass value + onChange) or uncontrolled (defaultValue).
  * Closes on outside-click and Escape; filters as you type when searchable.
  */

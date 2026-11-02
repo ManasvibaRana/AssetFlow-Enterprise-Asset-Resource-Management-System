@@ -171,11 +171,11 @@ export function ResourcesTab() {
               <tr key={r.id} className="border-b border-border-muted/60 align-top last:border-0 hover:bg-surface-container-low">
                 <td className="px-md py-3 font-semibold text-primary">{r.name}</td>
                 <td className="px-md py-3 text-on-surface-variant">{r.capacity} seats</td>
-                <td className="max-w-[200px] px-md py-3 text-on-surface-variant">{r.location || "—"}</td>
+                <td className="max-w-[200px] px-md py-3 text-on-surface-variant">{r.location || "-"}</td>
                 <td className="px-md py-3">
                   <div className="flex flex-wrap gap-1">
                     {r.amenities.length === 0 ? (
-                      <span className="text-on-surface-variant">—</span>
+                      <span className="text-on-surface-variant"> - </span>
                     ) : (
                       r.amenities.map((a) => (
                         <span key={a} className="rounded-full bg-surface-container-high px-2 py-0.5 font-label-caps text-[10px] font-semibold text-on-surface-variant">

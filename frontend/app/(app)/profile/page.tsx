@@ -96,7 +96,7 @@ export default function ProfilePage() {
       <h1 className="mb-lg font-display-lg text-display-lg text-primary">My Profile</h1>
 
       <div className="grid grid-cols-1 gap-lg lg:grid-cols-3">
-        {/* Left — identity summary */}
+        {/* Left - identity summary */}
         <aside className="lg:col-span-1">
           <div className="overflow-hidden rounded-xl border border-border-muted bg-surface lg:sticky lg:top-24">
             <div className="h-24 bg-gradient-to-br from-deep-navy to-primary-container" />
@@ -105,7 +105,7 @@ export default function ProfilePage() {
                 {initials(user.name)}
               </div>
               <p className="mt-sm font-headline-sm text-headline-sm text-primary">{user.name}</p>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">{user.title || "—"}</p>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">{user.title || "-"}</p>
               <div className="mt-md flex flex-wrap items-center justify-center gap-sm">
                 <RoleBadge role={user.role} />
                 <StatusPill status={user.status} />
@@ -113,13 +113,13 @@ export default function ProfilePage() {
 
               <div className="mt-lg w-full space-y-sm border-t border-border-muted pt-lg text-left">
                 <InfoRow icon={Mail} label="Email" value={user.email} mono />
-                <InfoRow icon={Building2} label="Department" value={user.department ?? "—"} />
+                <InfoRow icon={Building2} label="Department" value={user.department ?? "-"} />
               </div>
             </div>
           </div>
         </aside>
 
-        {/* Right — editable sections */}
+        {/* Right - editable sections */}
         <div className="space-y-lg lg:col-span-2">
           <Section title="Personal details" icon={UserCog}>
             <div className="grid grid-cols-1 gap-md sm:grid-cols-2">

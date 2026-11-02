@@ -35,7 +35,7 @@ type Card = {
   progress?: number;
 };
 
-// Relative "time since raised" — just now / minutes / hours / days / weeks / months / years.
+// Relative "time since raised" - just now / minutes / hours / days / weeks / months / years.
 function timeAgo(ms: number, now: number): string {
   const s = Math.max(0, Math.floor((now - ms) / 1000));
   if (s < 45) return "just now";
@@ -319,7 +319,7 @@ export function MaintenanceBoard() {
         <div>
           <h1 className="font-headline-md text-headline-md text-primary">Maintenance Management</h1>
           <p className="mt-xs font-body-md text-body-md text-on-surface-variant">
-            Approve and track enterprise asset repairs — drag a card to move it to the next step.
+            Approve and track enterprise asset repairs - drag a card to move it to the next step.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-sm">
@@ -525,7 +525,7 @@ export function MaintenanceBoard() {
                   options={assetOptions.map((a) => ({ label: `${a.tag} · ${a.name}`, value: a.tag }))}
                   value={form.assetTag}
                   onChange={(v) => setForm((f) => ({ ...f, assetTag: v }))}
-                  placeholder={assets.length ? "Search an asset…" : "No assets — register one first"}
+                  placeholder={assets.length ? "Search an asset…" : "No assets - register one first"}
                 />
               </Field>
               <Field label="Issue" error={errors.issue}>
@@ -557,7 +557,7 @@ export function MaintenanceBoard() {
         </div>
       )}
 
-      {/* Request detail modal — opens when a card is clicked */}
+      {/* Request detail modal - opens when a card is clicked */}
       {detail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-md">
           <div className="absolute inset-0 bg-black/40" aria-hidden="true" onClick={() => setDetail(null)} />

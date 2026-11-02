@@ -134,7 +134,7 @@ export type MaintenanceRequest = {
   resolvedAt: string | null;
 };
 
-// Bookable resources (conference rooms) — master data managed in Organization Setup.
+// Bookable resources (conference rooms) - master data managed in Organization Setup.
 export type Resource = {
   id: string;
   name: string;

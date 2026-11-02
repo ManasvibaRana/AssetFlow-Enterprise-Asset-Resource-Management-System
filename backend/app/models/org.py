@@ -34,7 +34,7 @@ class AssetCategory(Base):
 
 
 class Resource(Base):
-    # Bookable resources (conference rooms) — master data for Resource Booking.
+    # Bookable resources (conference rooms) - master data for Resource Booking.
     __tablename__ = "resources"
 
     id = Column(String(36), primary_key=True, default=_uuid)

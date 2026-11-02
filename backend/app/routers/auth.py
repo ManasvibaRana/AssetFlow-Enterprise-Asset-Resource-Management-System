@@ -45,7 +45,7 @@ def signup(body: SignupIn, background: BackgroundTasks, db: Session = Depends(ge
     if db.query(Employee).filter(Employee.email == body.email.lower()).first():
         raise HTTPException(status.HTTP_409_CONFLICT, "An account with this email already exists.")
 
-    # Signup always creates an Employee — roles are assigned later by an admin.
+    # Signup always creates an Employee - roles are assigned later by an admin.
     user = Employee(
         name=body.name.strip(),
         email=body.email.lower(),

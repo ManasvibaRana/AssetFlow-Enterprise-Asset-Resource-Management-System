@@ -12,7 +12,7 @@ _ITERATIONS = 200_000
 
 
 def hash_password(password: str) -> str:
-    """PBKDF2-HMAC-SHA256 (stdlib) — no C-extension dependency."""
+    """PBKDF2-HMAC-SHA256 (stdlib) - no C-extension dependency."""
     salt = os.urandom(16)
     dk = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, _ITERATIONS)
     return f"pbkdf2${_ITERATIONS}${base64.b64encode(salt).decode()}${base64.b64encode(dk).decode()}"

@@ -99,7 +99,7 @@ export function Timeline({
                 >
                   <div className="flex items-center justify-between gap-1">
                     <span className="truncate font-body-sm text-body-sm font-semibold text-deep-navy">{b.title}</span>
-                    <span className="shrink-0 font-mono-data text-xs text-on-surface-variant">{b.start}–{b.end}</span>
+                    <span className="shrink-0 font-mono-data text-xs text-on-surface-variant">{b.start}-{b.end}</span>
                   </div>
                   {!compact && (
                     <div className="mt-0.5 flex items-center gap-2">
@@ -125,7 +125,7 @@ export function Timeline({
                   >
                     <div className="flex items-center gap-xs text-indigo-accent">
                       <span className="font-label-caps text-[10px] font-bold uppercase tracking-wider">New booking</span>
-                      <span className="font-mono-data text-xs">{preview.start}–{preview.end}</span>
+                      <span className="font-mono-data text-xs">{preview.start}-{preview.end}</span>
                     </div>
                   </div>
                 );

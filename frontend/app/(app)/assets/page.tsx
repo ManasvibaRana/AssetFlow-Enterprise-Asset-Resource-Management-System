@@ -54,7 +54,7 @@ export default function AssetsPage() {
 
   const catName = useMemo(() => {
     const m = new Map(categories.map((c) => [c.id, c.name]));
-    return (id?: string | null) => (id ? m.get(id) ?? "—" : "—");
+    return (id?: string | null) => (id ? m.get(id) ?? "-" : "-");
   }, [categories]);
 
   async function loadAssets() {
@@ -224,7 +224,7 @@ export default function AssetsPage() {
             {!loading && shown.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-md py-10 text-center text-on-surface-variant">
-                  {assets.length === 0 ? "No assets yet — register your first one." : "No assets match these filters."}
+                  {assets.length === 0 ? "No assets yet - register your first one." : "No assets match these filters."}
                 </td>
               </tr>
             )}
@@ -251,9 +251,9 @@ export default function AssetsPage() {
 
             <dl className="my-lg divide-y divide-border-muted border-y border-border-muted">
               {[
-                ["Serial number", selected.serial_number || "—"],
+                ["Serial number", selected.serial_number || "-"],
                 ["Category", catName(selected.category_id)],
-                ["Location", selected.location || "—"],
+                ["Location", selected.location || "-"],
                 ["Condition", selected.condition],
                 ["Bookable", selected.is_bookable ? "Yes" : "No"],
               ].map(([k, v]) => (

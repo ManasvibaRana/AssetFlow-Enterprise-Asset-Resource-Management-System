@@ -108,7 +108,7 @@ def create_asset(body: AssetCreate, db: Session = Depends(get_db)):
     db.flush()
     asset.asset_tag = f"AF-{asset.id:04d}"
     event(db, asset.id, "registered", f"{asset.name} registered")
-    create_notification(db, "asset", f"Asset {asset.asset_tag} — {asset.name} was registered")
+    create_notification(db, "asset", f"Asset {asset.asset_tag} - {asset.name} was registered")
     db.commit()
     db.refresh(asset)
     return serialize(asset)

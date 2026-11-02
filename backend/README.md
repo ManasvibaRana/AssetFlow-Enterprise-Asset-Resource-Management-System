@@ -1,10 +1,10 @@
-# AssetFlow API (P1 — Core & Org)
+# AssetFlow API (P1 - Core & Org)
 
 FastAPI + SQLAlchemy + PostgreSQL backend for the AssetFlow Organization Setup and auth.
 
 ## Stack
 - **FastAPI** (REST), **SQLAlchemy 2** (ORM)
-- **pg8000** — pure-Python Postgres driver (works on Windows ARM64 without C build tools)
+- **pg8000** - pure-Python Postgres driver (works on Windows ARM64 without C build tools)
 - **PyJWT** auth, **PBKDF2** password hashing (stdlib)
 
 ## Setup

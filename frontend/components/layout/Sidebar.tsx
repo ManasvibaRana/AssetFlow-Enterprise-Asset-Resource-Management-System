@@ -15,7 +15,7 @@ type SidebarProps = {
   onClose?: () => void;
 };
 
-// Shared row style — light surface in light mode, navy in dark mode.
+// Shared row style - light surface in light mode, navy in dark mode.
 const inactiveRow =
   "text-on-surface-variant hover:bg-surface-container-high hover:text-primary dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white";
 

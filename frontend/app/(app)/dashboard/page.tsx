@@ -133,7 +133,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-md rounded-DEFAULT border border-status-critical/20 bg-error-container p-md text-on-error-container">
           <AlertTriangle className="h-5 w-5 shrink-0 text-status-critical" />
           <p className="flex-1 font-body-md text-body-md font-semibold">
-            {kpis.overdue} asset{kpis.overdue === 1 ? "" : "s"} overdue for return — flagged for follow-up
+            {kpis.overdue} asset{kpis.overdue === 1 ? "" : "s"} overdue for return - flagged for follow-up
           </p>
           <button aria-label="Dismiss" onClick={() => setBannerDismissed(true)} className="rounded-full p-1 hover:opacity-70">
             <X className="h-5 w-5" />
@@ -146,7 +146,7 @@ export default function DashboardPage() {
         {cards.map((k) => (
           <div key={k.label} className={`flex flex-col justify-between rounded-DEFAULT border border-border-muted border-t-2 bg-surface p-md shadow-card ${k.accent}`}>
             <p className="mb-sm font-label-caps text-label-caps font-semibold text-on-surface-variant">{k.label}</p>
-            <p className="font-display-lg text-display-lg text-primary">{loading ? "—" : k.value}</p>
+            <p className="font-display-lg text-display-lg text-primary">{loading ? "-" : k.value}</p>
           </div>
         ))}
       </div>

@@ -174,12 +174,12 @@ export function EmployeesTab() {
                     </span>
                     <div>
                       <p className="font-semibold text-primary">{e.name}</p>
-                      <p className="text-[12px] text-on-surface-variant">{e.title || "—"}</p>
+                      <p className="text-[12px] text-on-surface-variant">{e.title || "-"}</p>
                     </div>
                   </div>
                 </td>
                 <td className="px-md py-3 font-mono-data text-mono-data text-on-surface-variant">{e.email}</td>
-                <td className="px-md py-3 text-on-surface">{e.department ?? "—"}</td>
+                <td className="px-md py-3 text-on-surface">{e.department ?? "-"}</td>
                 <td className="px-md py-3">
                   <div className="relative">
                     <button

@@ -151,7 +151,7 @@ def seed() -> None:
                 ]
             )
 
-        # Notifications are no longer seeded — the feed reflects real actions only
+        # Notifications are no longer seeded - the feed reflects real actions only
         # (department/category/employee/role changes and asset lifecycle events).
 
         # Insight (P4): seed a sample audit cycle + activity so the pages show live data.

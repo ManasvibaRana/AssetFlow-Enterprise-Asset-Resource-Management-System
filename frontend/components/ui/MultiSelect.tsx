@@ -14,7 +14,7 @@ type MultiSelectProps = {
   className?: string;
 };
 
-/** Multi-select dropdown with removable chips and search — used to invite people to a booking. */
+/** Multi-select dropdown with removable chips and search - used to invite people to a booking. */
 export function MultiSelect({ options, value, onChange, placeholder = "Select…", icon, className = "" }: MultiSelectProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");

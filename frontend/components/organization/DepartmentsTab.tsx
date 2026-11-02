@@ -135,12 +135,12 @@ export function DepartmentsTab() {
                 <td className="px-md py-3">
                   <span className="flex items-center gap-sm text-on-surface">
                     <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-accent/10 text-[10px] font-semibold text-indigo-accent">
-                      {d.head ? initials(d.head) : "—"}
+                      {d.head ? initials(d.head) : "-"}
                     </span>
-                    {d.head || "—"}
+                    {d.head || "-"}
                   </span>
                 </td>
-                <td className="px-md py-3 text-on-surface-variant">{d.parent ?? "—"}</td>
+                <td className="px-md py-3 text-on-surface-variant">{d.parent ?? "-"}</td>
                 <td className="px-md py-3">
                   <StatusPill status={d.status} />
                 </td>

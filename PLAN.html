@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AssetFlow — 6-Hour Hackathon Plan</title>
+<title>AssetFlow - 6-Hour Hackathon Plan</title>
 <style>
   :root {
     --bg: #f6f8fb;
@@ -227,7 +227,7 @@
 <div class="wrap">
   <header class="hero">
     <p class="eyebrow">Odoo Hackathon 2026 · Team of 4 · 6 Hours</p>
-    <h1>AssetFlow <span>— build plan &amp; module split</span></h1>
+    <h1>AssetFlow <span> - build plan &amp; module split</span></h1>
     <p class="lead" style="max-width:64ch;">Enterprise Asset &amp; Resource Management System. Four full-stack developers, four independent verticals, one locked schema. This is the single source of truth for who builds what.</p>
     <div class="meta">
       <span class="chip"><span class="dot" style="background:var(--p2)"></span> <b>Next.js</b> frontend</span>
@@ -236,14 +236,14 @@
       <span class="chip"><b>6h</b> budget</span>
     </div>
     <div class="callout">
-      <b>Golden rule for independence:</b> lock the <b>DB schema</b> and <b>API contract</b> in the first 45 minutes. After that, each person only touches their own folders. The only two shared imports everyone uses are the <b>auth dependency</b> and the <b>notify() helper</b> — both finished before parallel work begins, so nobody waits.
+      <b>Golden rule for independence:</b> lock the <b>DB schema</b> and <b>API contract</b> in the first 45 minutes. After that, each person only touches their own folders. The only two shared imports everyone uses are the <b>auth dependency</b> and the <b>notify() helper</b> - both finished before parallel work begins, so nobody waits.
     </div>
   </header>
 
   <!-- 1. OWNERSHIP -->
   <section id="ownership">
     <h2><span class="num">01</span> Module Ownership</h2>
-    <p class="sec-title">Four verticals — each owns DB + API + UI</p>
+    <p class="sec-title">Four verticals - each owns DB + API + UI</p>
     <div class="grid">
       <div class="owner" style="--pc:var(--p1)">
         <span class="tag">P1 · Core &amp; Org</span>
@@ -303,15 +303,15 @@
 frontend/app/
   (auth)/ org/   <span class="cm"># P1</span>      assets/    <span class="cm"># P2</span>
   ops/           <span class="cm"># P3</span>      audit/ dashboard/ reports/ activity/   <span class="cm"># P4</span>
-  components/ui/ <span class="cm"># SHARED — built in Phase 0, then FROZEN</span>
-  lib/api.ts     <span class="cm"># SHARED — fetch wrapper + auth token</span></code></pre></div>
-    <p style="margin-top:14px;font-size:13.5px;">You only edit files inside your own folders. Shared folders (<code>core/</code>, <code>components/ui/</code>, <code>lib/api.ts</code>) are built in Phase 0 and frozen — changes need a team ping.</p>
+  components/ui/ <span class="cm"># SHARED - built in Phase 0, then FROZEN</span>
+  lib/api.ts     <span class="cm"># SHARED - fetch wrapper + auth token</span></code></pre></div>
+    <p style="margin-top:14px;font-size:13.5px;">You only edit files inside your own folders. Shared folders (<code>core/</code>, <code>components/ui/</code>, <code>lib/api.ts</code>) are built in Phase 0 and frozen - changes need a team ping.</p>
   </section>
 
   <!-- 3. SCHEMA -->
   <section id="schema">
     <h2><span class="num">03</span> Database Schema</h2>
-    <p class="sec-title">Lock this in the first 45 minutes — it's the #1 graded item</p>
+    <p class="sec-title">Lock this in the first 45 minutes - it's the #1 graded item</p>
     <div class="code-scroll"><pre><code><span class="cm">-- P1 --------------------------------------------------------------</span>
 <span class="kw">employees</span>(id, name, email UNIQUE, password_hash, department_id →departments,
   role <span class="en">ENUM[employee|dept_head|asset_manager|admin]</span> DEFAULT employee,
@@ -364,7 +364,7 @@ frontend/app/
         <div class="n">2</div>
         <div>
           <h4>No booking overlap</h4>
-          <p>Reject a new booking unless <code>new.end &lt;= existing.start OR new.start &gt;= existing.end</code> for the same resource. 9:00–10:00 booked → 9:30–10:30 rejected, 10:00–11:00 accepted.</p>
+          <p>Reject a new booking unless <code>new.end &lt;= existing.start OR new.start &gt;= existing.end</code> for the same resource. 9:00-10:00 booked → 9:30-10:30 rejected, 10:00-11:00 accepted.</p>
         </div>
       </div>
       <div class="rule">
@@ -383,25 +383,25 @@ frontend/app/
     <p class="sec-title">Together, then fully parallel, then integrate</p>
     <div class="phases">
       <div class="phase">
-        <div class="time">0:00 – 0:45 · FOUNDATION (all together)</div>
+        <div class="time">0:00 - 0:45 · FOUNDATION (all together)</div>
         <h4>Lock the schema, ship the shared plumbing</h4>
         <ul>
           <li><b>P1:</b> repo scaffold, Postgres, FastAPI, auth (signup/login/JWT), <code>get_current_user</code> + <code>require_role</code> deps.</li>
-          <li><b>P4:</b> <code>notify()</code> + <code>log_activity()</code> helpers + their tables — ship as importable functions.</li>
+          <li><b>P4:</b> <code>notify()</code> + <code>log_activity()</code> helpers + their tables - ship as importable functions.</li>
           <li><b>P2 &amp; P3:</b> write models against the schema, seed data, build the frozen <code>components/ui</code> shell.</li>
           <li><b>ALL:</b> finalize schema + API contract. Do not leave this phase until the schema is locked.</li>
         </ul>
       </div>
       <div class="phase">
-        <div class="time">0:45 – 4:30 · PARALLEL VERTICALS (independent)</div>
+        <div class="time">0:45 - 4:30 · PARALLEL VERTICALS (independent)</div>
         <h4>Each person: models → API → UI, own folders only</h4>
         <ul>
-          <li>Only dependencies are <code>require_role</code> (P1) and <code>notify()</code> (P4) — already done.</li>
-          <li>Commit every ~30 min. Aim for 8–12 commits each.</li>
+          <li>Only dependencies are <code>require_role</code> (P1) and <code>notify()</code> (P4) - already done.</li>
+          <li>Commit every ~30 min. Aim for 8-12 commits each.</li>
         </ul>
       </div>
       <div class="phase">
-        <div class="time">4:30 – 5:15 · INTEGRATION</div>
+        <div class="time">4:30 - 5:15 · INTEGRATION</div>
         <h4>Merge to main, wire the dashboard</h4>
         <ul>
           <li>P1 reviews &amp; merges branches. P4 wires dashboard KPIs to real data via API.</li>
@@ -409,7 +409,7 @@ frontend/app/
         </ul>
       </div>
       <div class="phase">
-        <div class="time">5:15 – 6:00 · POLISH + DEMO PREP</div>
+        <div class="time">5:15 - 6:00 · POLISH + DEMO PREP</div>
         <h4>Validation pass, seed the demo story, rehearse</h4>
         <ul>
           <li>Seed one clean story: register → allocate → maintenance → approve → resolve → return → audit.</li>
@@ -422,8 +422,8 @@ frontend/app/
   <!-- 6. GIT + SCORECARD -->
   <section id="git">
     <h2><span class="num">06</span> Git &amp; Evaluation</h2>
-    <p class="sec-title">They grade teamwork — one person's repo is a red flag</p>
-    <p style="font-size:13.5px;">Branch per person: <code>feat/org</code>, <code>feat/assets</code>, <code>feat/ops</code>, <code>feat/insight</code>. Everyone commits under their own name. PR into <code>main</code> (P1 reviews). Protect <code>main</code> — no direct pushes.</p>
+    <p class="sec-title">They grade teamwork - one person's repo is a red flag</p>
+    <p style="font-size:13.5px;">Branch per person: <code>feat/org</code>, <code>feat/assets</code>, <code>feat/ops</code>, <code>feat/insight</code>. Everyone commits under their own name. PR into <code>main</code> (P1 reviews). Protect <code>main</code> - no direct pushes.</p>
     <div class="table-scroll" style="margin-top:16px;">
       <table>
         <thead><tr><th>Criterion (Odoo brief)</th><th>How we cover it</th></tr></thead>
@@ -443,7 +443,7 @@ frontend/app/
   <!-- 7. PRESENTATION -->
   <section id="present">
     <h2><span class="num">07</span> Presentation Split</h2>
-    <p class="sec-title">Everyone speaks — demo your own vertical</p>
+    <p class="sec-title">Everyone speaks - demo your own vertical</p>
     <div class="grid">
       <div class="owner" style="--pc:var(--p1)"><span class="tag">P1</span><h3>Access &amp; setup</h3><ul><li>Signup never self-elevates</li><li>Org Setup master data</li><li>Promote employee → Asset Manager</li></ul></div>
       <div class="owner" style="--pc:var(--p2)"><span class="tag">P2</span><h3>Asset lifecycle</h3><ul><li>Register asset (auto tag AF-0001)</li><li>Allocate it</li><li>Double-allocation block + transfer</li></ul></div>
@@ -455,7 +455,7 @@ frontend/app/
   <!-- 8. CHECKLISTS -->
   <section id="checklists">
     <h2><span class="num">08</span> Per-Person Checklists</h2>
-    <p class="sec-title">Tick as you go — progress saves in your browser</p>
+    <p class="sec-title">Tick as you go - progress saves in your browser</p>
     <div class="checks">
       <div class="checkcard" style="--pc:var(--p1)">
         <h3><span class="badge">P1</span> Core &amp; Org</h3>

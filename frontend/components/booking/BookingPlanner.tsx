@@ -136,7 +136,7 @@ export function BookingPlanner() {
       <div>
         <h1 className="mb-1 font-headline-md text-headline-md text-primary">Resource Booking</h1>
         <p className="font-body-sm text-body-sm text-on-surface-variant">
-          Plan reservations for conference rooms — pick a slot, invite your team, and book.
+          Plan reservations for conference rooms - pick a slot, invite your team, and book.
         </p>
       </div>
 
@@ -217,7 +217,7 @@ export function BookingPlanner() {
                   <div>
                     <p className="font-body-sm text-body-sm font-semibold text-status-warning">Scheduling Conflict</p>
                     <p className="mt-xs font-body-sm text-xs text-status-warning/80">
-                      Overlaps “{clash.title}” ({clash.start}–{clash.end}). Pick another slot.
+                      Overlaps “{clash.title}” ({clash.start}-{clash.end}). Pick another slot.
                     </p>
                   </div>
                 </div>
@@ -225,7 +225,7 @@ export function BookingPlanner() {
             ) : justBooked ? (
               <div className="rounded-r-DEFAULT border-l-4 border-emerald-active bg-emerald-active/10 p-sm">
                 <p className="flex items-center gap-xs font-body-sm text-body-sm font-semibold text-emerald-active">
-                  <Check className="h-4 w-4" /> Booked — added to the schedule.
+                  <Check className="h-4 w-4" /> Booked - added to the schedule.
                 </p>
               </div>
             ) : null}
@@ -288,7 +288,7 @@ export function BookingPlanner() {
                 </div>
                 <div>
                   <p className="mb-xs font-label-caps text-label-caps font-semibold uppercase text-on-surface-variant">Time</p>
-                  <p className="font-mono-data text-mono-data text-on-surface">{detail.start} – {detail.end}</p>
+                  <p className="font-mono-data text-mono-data text-on-surface">{detail.start} - {detail.end}</p>
                 </div>
                 <div>
                   <p className="mb-xs font-label-caps text-label-caps font-semibold uppercase text-on-surface-variant">Date</p>

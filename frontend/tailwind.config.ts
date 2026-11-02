@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-// AssetFlow Professional design system — tokens mirrored from the Stitch design.
+// AssetFlow Professional design system - tokens mirrored from the Stitch design.
 const rgbVar = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
 
 const config: Config = {
@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Accent / brand colors — identical in both themes (static hex).
+        // Accent / brand colors - identical in both themes (static hex).
         "deep-navy": "#0F172A",
         "primary-container": "#1e293b",
         "on-primary": "#ffffff",
@@ -33,7 +33,7 @@ const config: Config = {
         "on-error-container": "#93000a",
         "status-warning": "#F59E0B",
         "status-critical": "#EF4444",
-        // Theme-flippable tokens — driven by CSS variables (see globals.css).
+        // Theme-flippable tokens - driven by CSS variables (see globals.css).
         primary: rgbVar("primary"),
         surface: rgbVar("surface"),
         "surface-subtle": rgbVar("surface-subtle"),

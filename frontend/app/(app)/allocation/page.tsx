@@ -120,7 +120,7 @@ export default function AllocationPage() {
       await api.requestTransfer(selected.id, { to_holder: `${holderType}:${holderId}` });
       await reload();
       resetForm();
-      flash("Transfer requested — awaiting approval");
+      flash("Transfer requested - awaiting approval");
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Failed to request transfer.");
     } finally {
@@ -136,7 +136,7 @@ export default function AllocationPage() {
       setReturnFor(null);
       setCheckinNotes("");
       await reload();
-      flash("Asset returned — now available");
+      flash("Asset returned - now available");
     } catch (e) {
       flash(e instanceof ApiError ? e.message : "Failed to return.");
     } finally {
@@ -187,7 +187,7 @@ export default function AllocationPage() {
             <option value="">Choose an asset…</option>
             {assets.map((a) => (
               <option key={a.id} value={a.id}>
-                {a.asset_tag} — {a.name} ({a.status.replaceAll("_", " ")})
+                {a.asset_tag} - {a.name} ({a.status.replaceAll("_", " ")})
               </option>
             ))}
           </select>
@@ -280,9 +280,9 @@ export default function AllocationPage() {
                     <p className="font-semibold text-primary">{a.name}</p>
                     <p className="font-mono-data text-mono-data text-indigo-accent">{a.asset_tag}</p>
                   </td>
-                  <td className="px-md py-3 text-on-surface">{activeHolder(a) ?? "—"}</td>
+                  <td className="px-md py-3 text-on-surface">{activeHolder(a) ?? "-"}</td>
                   <td className="px-md py-3">
-                    <span className="text-on-surface-variant">{a.active_allocation?.expected_return_date ?? "—"}</span>
+                    <span className="text-on-surface-variant">{a.active_allocation?.expected_return_date ?? "-"}</span>
                     {isOverdue(a) && (
                       <span className="ml-2 rounded-full bg-status-critical/10 px-2 py-0.5 font-label-caps text-[10px] font-bold text-status-critical">
                         Overdue
